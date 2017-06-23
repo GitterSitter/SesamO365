@@ -1,7 +1,7 @@
 {
   "name": "node-tutorial",
   "version": "1.0.0",
-  "description": "A simple Node.js tutorial to use the Mail API",
+  "description": "A simple Node.js tutorial to use the API",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
