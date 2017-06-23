@@ -20,6 +20,8 @@ function home(response, request) {
   response.end();
 }
 
+
+
 var url = require('url');
 function authorize(response, request) {
   console.log('Request handler \'authorize\' was called.');
