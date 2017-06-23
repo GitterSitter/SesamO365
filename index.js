@@ -2,7 +2,9 @@
 var server = require('./server');
 var router = require('./router');
 var authHelper = require('./authHelper');
+var request = require("request");
 var microsoftGraph = require("@microsoft/microsoft-graph-client");
+var fs = require('fs');
 
 var handle = {};
 handle['/'] = home;
@@ -10,6 +12,10 @@ handle['/authorize'] = authorize;
 handle['/mail'] = mail;
 handle['/calendar'] = calendar;
 handle['/contacts'] = contacts;
+handle['/photo'] = photo;
+handle['/me'] = me;
+handle['/users'] = users;
+
 
 server.start(router.route, handle);
 
@@ -281,4 +287,131 @@ function contacts(response, request) {
     response.write('<p> No token found in cookie!</p>');
     response.end();
   }
+}
+
+
+
+function updateProfilePicture() {
+			var file = document.querySelector('input[type=file]').files[0];
+			var reader = new FileReader();
+			reader.addEventListener("load", function () {
+				client
+					.api('/me/photo/$value')
+					.put(file, (err, res) => {
+						if (err) {
+							console.log(err);
+							return;
+						}
+						console.log("We've updated your picture!");
+					});
+			}, false);
+			if (file) {
+				reader.readAsDataURL(file);
+			}
+		}
+
+
+function uploadPhoto(){
+    let photoReadStream = fs.createReadStream('../logo.png');
+client
+    .api('/me/drive/root/children/logo234.png/content')
+    .putStream(photoReadStream, (err) => {
+        console.log(err);
+    });
+}
+
+function photo(response, request) {
+  var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
+  //console.log('Token found in cookie: ', token);
+  var email = getValueFromCookie('node-tutorial-email', request.headers.cookie);
+
+
+  // Get the profile photo of the current user (from the user's mailbox on Exchange Online).
+  // This operation in version 1.0 supports only work or school mailboxes, not personal mailboxes.
+
+
+  if (token) {
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.write('<div><h1>Your Photo</h1></div>');
+    var client = microsoftGraph.Client.init({
+      authProvider: (done) => {
+        // Just return the token
+        done(null, token);
+      }
+    });
+
+    client
+      .api('/me/photo/$value')
+      .responseType('blob')
+      //.get((err, res,rawResponse) => {
+      .getStream((err, downloadStream) => {
+        let writeStream = fs.createWriteStream('../myPhoto.jpg');
+        downloadStream.pipe(writeStream).on('error', console.log);
+    
+        if (err) {
+          console.log('error: ' + err);
+          response.write('<p>ERROR: ' + err + '</p>');
+          response.end();
+        } else {   
+
+      // let profilePhotoReadStream = fs.createReadStream('me.jpg');
+        //  console.log(downloadStream);
+        console.log("Image downloaded!")
+          response.end();
+        }
+      });
+  } else {
+    response.writeHead(200, {'Content-Type': 'text/html'});
+    response.write('<p> No token found in cookie!</p>');
+    response.end();
+  }
+}
+
+
+function me(response, request){
+  var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
+
+
+  var client = microsoftGraph.Client.init({
+      authProvider: (done) => {
+        // Just return the token
+        done(null, token);
+      }
+    });
+
+  client
+    .api('/me')
+    //.select("displayName")
+    .get((err, res) => {
+        if (err) {
+            console.log(err)
+            return;
+        }
+         console.log(res);
+         console.log(res.displayName);
+    });
+}
+
+
+
+
+function users(response, request){
+var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
+  var client = microsoftGraph.Client.init({
+      authProvider: (done) => {
+        done(null, token);
+      }
+    });
+
+client
+    .api('/users')
+    .version('beta')
+    .get((err, res) => {
+        if (err) {
+            console.log(err);
+            return;
+        }
+        console.log("Found", res.value.length, "users");
+    });
+
 }
