@@ -12,7 +12,6 @@ function start(route, handle) {
   http.createServer(onRequest).listen(port);
   console.log('Server has started. Listening on port: ' + port + '...');
 
-  
 }
 
 exports.start = start;
