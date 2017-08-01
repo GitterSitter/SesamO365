@@ -1,70 +1,65 @@
-// Copyright (c) Microsoft. All rights reserved. Licensed under the MIT license. See LICENSE.txt in the project root for license information.
+// {
+//   "_id": "salesforce",
+//   "type": "system:microservice",
+//   "name": "Salesforce",
+//   "authentication": "basic",
+//   "connect_timeout": 60,
+//   "docker": {
+//     "environment": {
+//       "VERSION": "1"
+//     },
+//     "image": "sesambuild/salesforce:latest",
+//     "port": 5000
+//   },
+//   "password": "$SECRET(salesforce-password)",
+//   "read_timeout": 7200,
+//   "use_https": false,
+//   "username": "$SECRET(salesforce-secret)\\$SECRET(salesforce-user)",
+//   "verify_ssl": false
+// }
+
+
 var server = require('./server');
 var router = require('./router');
-var authHelper = require('./authHelper');
 var request = require("request");
 var microsoftGraph = require("@microsoft/microsoft-graph-client");
 var fs = require('fs');
-
+var FileReader = require('filereader')
+var url = require('url');
+var auth = require('./auth');
 var handle = {};
-handle['/'] = home;
-handle['/authorize'] = authorize;
-handle['/mail'] = mail;
+handle['/mail'] = userEmail;
 handle['/calendar'] = calendar;
 handle['/contacts'] = contacts;
-handle['/photo'] = photo;
-handle['/me'] = me;
+handle['/photo'] =  updateProfilePicture; //photoDownload;
 handle['/users'] = users;
 
 
 server.start(router.route, handle);
 
-function home(response, request) {
-  console.log('Request handler \'home\' was called.');
-  response.writeHead(200, {'Content-Type': 'text/html'});
-  response.write('<p>Please <a href="' + authHelper.getAuthUrl() + '">sign in</a> with your Office 365 or Outlook.com account.</p>');
-  response.end();
+var token = "";
+function saveToken(tok){
+token = tok;
 }
 
-
-
-var url = require('url');
-function authorize(response, request) {
-  console.log('Request handler \'authorize\' was called.');
+auth.getAccessToken().then(function (token) {
+  // Get all of the users in the tenant.
+   // console.log(token);
+  saveToken(token)
+    .then(function (tok) {    
+      // Create an event on each user's calendar.
+     // graph.createEvent(token, users);
+    }, function (error) {
   
-  // The authorization code is passed as a query parameter
-  var url_parts = url.parse(request.url, true);
-  var code = url_parts.query.code;
-  console.log('Code: ' + code);
-  authHelper.getTokenFromCode(code, tokenReceived, response);
-}
+      console.error('>>> Error getting users: ' + error);
+    });
+}, function (error) {
+  console.error('>>> Error getting access token: ' + error);
+});
 
-function tokenReceived(response, error, token) {
-  if (error) {
-    console.log('Access token error: ', error.message);
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<p>ERROR: ' + error + '</p>');
-    response.end();
-  } else {
-    getUserEmail(token.token.access_token, function(error, email){
-      if (error) {
-        console.log('getUserEmail returned an error: ' + error);
-        response.write('<p>ERROR: ' + error + '</p>');
-        response.end();
-      } else if (email) {
-        var cookies = ['node-tutorial-token=' + token.token.access_token + ';Max-Age=4000',
-                       'node-tutorial-refresh-token=' + token.token.refresh_token + ';Max-Age=4000',
-                       'node-tutorial-token-expires=' + token.token.expires_at.getTime() + ';Max-Age=4000',
-                       'node-tutorial-email=' + email + ';Max-Age=4000'];
-        response.setHeader('Set-Cookie', cookies);
-        response.writeHead(302, {'Location': 'http://localhost:8000/mail'});
-        response.end();
-      }
-    }); 
-  }
-}
 
-function getUserEmail(token, callback) {
+function userEmail(userId){
+userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
   // Create a Graph client
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
@@ -72,267 +67,170 @@ function getUserEmail(token, callback) {
       done(null, token);
     }
   });
-
   // Get the Graph /Me endpoint to get user email address
   client
-    .api('/me')
+    .api('/users/'+ userId+ '/mail')
     .get((err, res) => {
       if (err) {
-        callback(err, null);
+      
+       console.log(err);
       } else {
-        callback(null, res.mail);
+      
+       console.log(res.value);
+      
       }
+     
     });
+
 }
 
-function getValueFromCookie(valueName, cookie) {
-  if (cookie.indexOf(valueName) !== -1) {
-    var start = cookie.indexOf(valueName) + valueName.length + 1;
-    var end = cookie.indexOf(';', start);
-    end = end === -1 ? cookie.length : end;
-    return cookie.substring(start, end);
-  }
-}
 
-function getAccessToken(request, response, callback) {
-  var expiration = new Date(parseFloat(getValueFromCookie('node-tutorial-token-expires', request.headers.cookie)));
+function users(response, request) {
+  console.log(request.method);
 
-  if (expiration <= new Date()) {
-    // refresh token
-    console.log('TOKEN EXPIRED, REFRESHING');
-    var refresh_token = getValueFromCookie('node-tutorial-refresh-token', request.headers.cookie);
-    authHelper.refreshAccessToken(refresh_token, function(error, newToken){
-      if (error) {
-        callback(error, null);
-      } else if (newToken) {
-        var cookies = ['node-tutorial-token=' + newToken.token.access_token + ';Max-Age=4000',
-                       'node-tutorial-refresh-token=' + newToken.token.refresh_token + ';Max-Age=4000',
-                       'node-tutorial-token-expires=' + newToken.token.expires_at.getTime() + ';Max-Age=4000'];
-        response.setHeader('Set-Cookie', cookies);
-        callback(null, newToken.token.access_token);
-      }
-    });
-  } else {
-    // Return cached token
-    var access_token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
-    callback(null, access_token);
-  }
-}
-
-function mail(response, request) {
-  getAccessToken(request, response, function(error, token) {
-    console.log('Token found in cookie: ', token);
-    var email = getValueFromCookie('node-tutorial-email', request.headers.cookie);
-    console.log('Email found in cookie: ', email);
-    if (token) {
-      response.writeHead(200, {'Content-Type': 'text/html'});
-      response.write('<div><h1>Your inbox</h1></div>');
-
-      // Create a Graph client
-      var client = microsoftGraph.Client.init({
+  var userId =  "e97f274a-2a86-4280-997d-8ee4d2c52078"; //"30be01d3-8214-4f2d-aea0-7028a19581fc" ;//"e97f274a-2a86-4280-997d-8ee4d2c52078";
+  var client = microsoftGraph.Client.init({
         authProvider: (done) => {
           // Just return the token
           done(null, token);
         }
       });
+ //users/30be01d3-8214-4f2d-aea0-7028a19581fc/mobilePhone               
+  //request.method
 
-      // Get the 10 newest messages
+  //tlf nr funker! /mobilePhone
+//If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
+  //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
+  //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
+  if("POST" == "POST"){
+    client.api("/users/"+userId+"/displayName")  //Skaflestad britt.skaflestad@bouvet.no
+       .patch(
+        {"value": "Test"},
+        (err, res) => {
+            if (err)
+                console.log(err);
+            else
+                console.log("Profile Updated");
+        });
+  }else{
       client
-        .api('/me/mailfolders/inbox/messages')
-        .header('X-AnchorMailbox', email)
-        .top(10)
-        .select('subject,from,receivedDateTime,isRead')
-        .orderby('receivedDateTime DESC')
+        .api('/users')
+       // .header('X-AnchorMailbox', email)
+        // .top(20)
+        // .select('subject,from,receivedDateTime,isRead')
+        // .orderby('receivedDateTime DESC')
         .get((err, res) => {
           if (err) {
-            console.log('getMessages returned an error: ' + err);
+            console.log('getUsers returned an error: ' + err);
             response.write('<p>ERROR: ' + err + '</p>');
             response.end();
           } else {
-            console.log('getMessages returned ' + res.value.length + ' messages.');
-            response.write('<table><tr><th>From</th><th>Subject</th><th>Received</th></tr>');
-            res.value.forEach(function(message) {
-              console.log('  Subject: ' + message.subject);
-              var from = message.from ? message.from.emailAddress.name : 'NONE';
-              response.write('<tr><td>' + from + 
-                '</td><td>' + (message.isRead ? '' : '<b>') + message.subject + (message.isRead ? '' : '</b>') +
-                '</td><td>' + message.receivedDateTime.toString() + '</td></tr>');
-            });
-            
-            response.write('</table>');
+          
+            response.write('');
+            // res.value.forEach(function(message) {
+            //   console.log('User: ' + message);
+              
+            //   response.write(message);
+            // });
+           // console.log(res.value);
+              
             response.end();
           }
         });
-    } else {
-      response.writeHead(200, {'Content-Type': 'text/html'});
-      response.write('<p> No token found in cookie!</p>');
-      response.end();
-    }
-  });
+
+        }
 }
 
-function buildAttendeeString(attendees) {
 
-  var attendeeString = '';
-  if (attendees) {
-    attendees.forEach(function(attendee) {
-      attendeeString += '<p>Name:' + attendee.emailAddress.name + '</p>';
-      attendeeString += '<p>Email:' + attendee.emailAddress.address + '</p>';
-      attendeeString += '<p>Type:' + attendee.type + '</p>';
-      attendeeString += '<p>Response:' + attendee.status.response + '</p>';
-      attendeeString += '<p>Respond time:' + attendee.status.time + '</p>';
-    });
-  }
+function calendar(userId) {
+  userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
 
-  return attendeeString;
-}
-
-function calendar(response, request) {
-  var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
-  console.log('Token found in cookie: ', token);
-  var email = getValueFromCookie('node-tutorial-email', request.headers.cookie);
-  console.log('Email found in cookie: ', email);
-  if (token) {
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<div><h1>Your calendar</h1></div>');
-
-    // Create a Graph client
-    var client = microsoftGraph.Client.init({
-      authProvider: (done) => {
-        // Just return the token
-        done(null, token);
-      }
-    });
-
-    // Get the 10 events with the greatest start date
-    client
-      .api('/me/events')
-      .header('X-AnchorMailbox', email)
-      .top(10)
-      .select('subject,start,end,attendees')
-      .orderby('start/dateTime DESC')
-      .get((err, res) => {
-        if (err) {
-          console.log('getEvents returned an error: ' + err);
-          response.write('<p>ERROR: ' + err + '</p>');
-          response.end();
-        } else {
-          console.log('getEvents returned ' + res.value.length + ' events.');
-          response.write('<table><tr><th>Subject</th><th>Start</th><th>End</th><th>Attendees</th></tr>');
-          res.value.forEach(function(event) {
-            console.log('  Subject: ' + event.subject);
-            response.write('<tr><td>' + event.subject + 
-              '</td><td>' + event.start.dateTime.toString() +
-              '</td><td>' + event.end.dateTime.toString() +
-              '</td><td>' + buildAttendeeString(event.attendees) + '</td></tr>');
-          });
-          
-          response.write('</table>');
-          response.end();
+   var client = microsoftGraph.Client.init({
+        authProvider: (done) => {
+          // Just return the token
+          done(null, token);
         }
       });
-  } else {
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<p> No token found in cookie!</p>');
-    response.end();
-  }
+      client
+        .api('/users/'+userId+'/events')
+         .get((err, res) => {
+      if (err) {
+      
+       console.log(err);
+      } else {    
+       console.log(res.value);
+      }
+     
+    });
 }
 
-function contacts(response, request) {
-  var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
-  console.log('Token found in cookie: ', token);
-  var email = getValueFromCookie('node-tutorial-email', request.headers.cookie);
-  console.log('Email found in cookie: ', email);
-  if (token) {
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<div><h1>Your contacts</h1></div>');
+function contacts(userId) {
+  userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
 
-    // Create a Graph client
-    var client = microsoftGraph.Client.init({
-      authProvider: (done) => {
-        // Just return the token
-        done(null, token);
-      }
-    });
-
-    // Get the first 10 contacts in alphabetical order
-    // by given name
-    client
-      .api('/me/contacts')
-      .header('X-AnchorMailbox', email)
-      .top(10)
-      .select('givenName,surname,emailAddresses')
-      .orderby('givenName ASC')
-      .get((err, res) => {
-        if (err) {
-          console.log('getContacts returned an error: ' + err);
-          response.write('<p>ERROR: ' + err + '</p>');
-          response.end();
-        } else {
-          console.log('getContacts returned ' + res.value.length + ' contacts.');
-          response.write('<table><tr><th>First name</th><th>Last name</th><th>Email</th></tr>');
-          res.value.forEach(function(contact) {
-            var email = contact.emailAddresses[0] ? contact.emailAddresses[0].address : 'NONE';
-            response.write('<tr><td>' + contact.givenName + 
-              '</td><td>' + contact.surname +
-              '</td><td>' + email + '</td></tr>');
-          });
-          
-          response.write('</table>');
-          response.end();
+   var client = microsoftGraph.Client.init({
+        authProvider: (done) => {
+          // Just return the token
+          done(null, token);
         }
       });
-  } else {
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<p> No token found in cookie!</p>');
-    response.end();
-  }
+      client
+        .api('/users/'+userId+'/contacts')
+         .get((err, res) => {
+      if (err) {
+      
+       console.log(err);
+      } else {    
+       console.log(res.value);
+      }
+     
+    });
 }
-
 
 
 function updateProfilePicture() {
-			var file = document.querySelector('input[type=file]').files[0];
-			var reader = new FileReader();
-			reader.addEventListener("load", function () {
-				client
-					.api('/me/photo/$value')
+  var client = microsoftGraph.Client.init({
+      authProvider: (done) => {
+        // Just return the token
+        done(null, token);
+      }
+    });
+
+     var userId =  "30be01d3-8214-4f2d-aea0-7028a19581fc";  //(britt)    "8fa20769-13f0-4b67-b777-c262b174d93e"; (Eirik?)  //e97f274a-2a86-4280-997d-8ee4d2c52078  (min)
+     var file = fs.readFileSync('./logo.png'); // fs.openSync("logo.png","r"); //new File("logo.png");       
+     //var reader = new FileReader();
+    	client
+					.api("/users/"+userId+"/photo/$value")
 					.put(file, (err, res) => {
 						if (err) {
 							console.log(err);
 							return;
 						}
-						console.log("We've updated your picture!");
+						console.log("Image updated!");
 					});
-			}, false);
-			if (file) {
-				reader.readAsDataURL(file);
-			}
-		}
-
-
-function uploadPhoto(){
-    let photoReadStream = fs.createReadStream('../logo.png');
-client
-    .api('/me/drive/root/children/logo234.png/content')
-    .putStream(photoReadStream, (err) => {
-        console.log(err);
-    });
-}
-
-function photo(response, request) {
-  var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
-  //console.log('Token found in cookie: ', token);
-  var email = getValueFromCookie('node-tutorial-email', request.headers.cookie);
-
+      
+			// reader.addEventListener("load", function () {
+			// 	client
+			// 		.api('/users/e97f274a-2a86-4280-997d-8ee4d2c52078/photo/$value')
+			// 		.put(file, (err, res) => {
+			// 			if (err) {
+			// 				console.log(err);
+			// 				return;
+			// 			}
+			// 			console.log("We've updated your picture!");
+			// 		});
+			// }, false);
+			// if (file) {
+			// 	//reader.readAsDataURL(file);
+      // }
+  
+    }
+    
+function photoDownload(response, request, userId) {
 
   // Get the profile photo of the current user (from the user's mailbox on Exchange Online).
   // This operation in version 1.0 supports only work or school mailboxes, not personal mailboxes.
-
-
-  if (token) {
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<div><h1>Your Photo</h1></div>');
+  
+   userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
         // Just return the token
@@ -340,8 +238,8 @@ function photo(response, request) {
       }
     });
 
-    client
-      .api('/me/photo/$value')
+   client
+      .api('users/'+userId+'/photo/$value')
       .responseType('blob')
       //.get((err, res,rawResponse) => {
       .getStream((err, downloadStream) => {
@@ -360,58 +258,6 @@ function photo(response, request) {
           response.end();
         }
       });
-  } else {
-    response.writeHead(200, {'Content-Type': 'text/html'});
-    response.write('<p> No token found in cookie!</p>');
-    response.end();
-  }
 }
 
 
-function me(response, request){
-  var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
-
-
-  var client = microsoftGraph.Client.init({
-      authProvider: (done) => {
-        // Just return the token
-        done(null, token);
-      }
-    });
-
-  client
-    .api('/me')
-    //.select("displayName")
-    .get((err, res) => {
-        if (err) {
-            console.log(err)
-            return;
-        }
-         console.log(res);
-         console.log(res.displayName);
-    });
-}
-
-
-
-
-function users(response, request){
-var token = getValueFromCookie('node-tutorial-token', request.headers.cookie);
-  var client = microsoftGraph.Client.init({
-      authProvider: (done) => {
-        done(null, token);
-      }
-    });
-
-client
-    .api('/users')
-    .version('beta')
-    .get((err, res) => {
-        if (err) {
-            console.log(err);
-            return;
-        }
-        console.log("Found", res.value.length, "users");
-    });
-
-}
