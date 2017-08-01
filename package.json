@@ -1,7 +1,7 @@
 {
-  "name": "node-tutorial",
+  "name": "officeservice",
   "version": "1.0.0",
-  "description": "A simple Node.js tutorial to use the API",
+  "description": "O365 Microservice",
   "main": "index.js",
   "scripts": {
     "start": "node index.js"
