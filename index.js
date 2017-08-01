@@ -27,6 +27,16 @@ var fs = require('fs');
 var FileReader = require('filereader')
 var url = require('url');
 var auth = require('./auth');
+//var GraphAPI = require('azure-graphapi');  Azure AD API
+// var graph = new GraphAPI(tenant, clientId, clientSecret);
+// // The tenant, clientId, and clientSecret are usually in a configuration file. 
+ 
+// graph.get('users/a8272675-dc21-4ff4-bc8d-8647830fa7db', function(err, user) {
+//     if (!err) {
+//         console.dir(user);
+//     }
+// }
+
 var handle = {};
 handle['/mail'] = userEmail;
 handle['/calendar'] = calendar;
