@@ -1,32 +1,14 @@
-// {
-//   "_id": "salesforce",
-//   "type": "system:microservice",
-//   "name": "Salesforce",
-//   "authentication": "basic",
-//   "connect_timeout": 60,
-//   "docker": {
-//     "environment": {
-//       "VERSION": "1"
-//     },
-//     "image": "sesambuild/salesforce:latest",
-//     "port": 5000
-//   },
-//   "password": "$SECRET(salesforce-password)",
-//   "read_timeout": 7200,
-//   "use_https": false,
-//   "username": "$SECRET(salesforce-secret)\\$SECRET(salesforce-user)",
-//   "verify_ssl": false
-// }
-
 
 var server = require('./server');
 var router = require('./router');
 var request = require("request");
+
 var microsoftGraph = require("@microsoft/microsoft-graph-client");
 var fs = require('fs');
 var FileReader = require('filereader')
 var url = require('url');
 var auth = require('./auth');
+var request = require('request');
 //var GraphAPI = require('azure-graphapi');  Azure AD API
 // var graph = new GraphAPI(tenant, clientId, clientSecret);
 // // The tenant, clientId, and clientSecret are usually in a configuration file. 
@@ -43,7 +25,7 @@ handle['/calendar'] = calendar;
 handle['/contacts'] = contacts;
 handle['/photo'] =  updateProfilePicture; //photoDownload;
 handle['/users'] = users;
-
+handle['/groups'] = groups;
 
 server.start(router.route, handle);
 
@@ -53,14 +35,12 @@ token = tok;
 }
 
 auth.getAccessToken().then(function (token) {
-  // Get all of the users in the tenant.
    // console.log(token);
   saveToken(token)
     .then(function (tok) {    
       // Create an event on each user's calendar.
      // graph.createEvent(token, users);
-    }, function (error) {
-  
+    }, function (error) { 
       console.error('>>> Error getting users: ' + error);
     });
 }, function (error) {
@@ -70,34 +50,47 @@ auth.getAccessToken().then(function (token) {
 
 function userEmail(userId){
 userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-  // Create a Graph client
+
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
-      // Just return the token
       done(null, token);
     }
   });
-  // Get the Graph /Me endpoint to get user email address
   client
     .api('/users/'+ userId+ '/mail')
     .get((err, res) => {
-      if (err) {
-      
+      if (err) {     
        console.log(err);
       } else {
       
-       console.log(res.value);
-      
-      }
-     
+       console.log(res.value);     
+      }     
     });
 
 }
 
+function groups (response,request){
+ var client = microsoftGraph.Client.init({
+        authProvider: (done) => {
+          done(null, token);
+        }
+      });
+        client.api("/groups/") 
+      .get((err, res) => {
+          if (err) {
+            console.log(err);
+          } else {         
+            console.log(response.statusCode );
+            console.log(res.value);
+             console.log(res);
+          }
+        });
+
+         }
+
 
 function users(response, request) {
   console.log(request.method);
-
   var userId =  "e97f274a-2a86-4280-997d-8ee4d2c52078"; //"30be01d3-8214-4f2d-aea0-7028a19581fc" ;//"e97f274a-2a86-4280-997d-8ee4d2c52078";
   var client = microsoftGraph.Client.init({
         authProvider: (done) => {
@@ -112,7 +105,7 @@ function users(response, request) {
 //If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
   //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
   //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
-  if("POST" == "POST"){
+  if(request.method == "POST"){
     client.api("/users/"+userId+"/displayName")  //Skaflestad britt.skaflestad@bouvet.no
        .patch(
         {"value": "Test"},
@@ -123,41 +116,82 @@ function users(response, request) {
                 console.log("Profile Updated");
         });
   }else{
-      client
-        .api('/users')
-       // .header('X-AnchorMailbox', email)
-        // .top(20)
-        // .select('subject,from,receivedDateTime,isRead')
-        // .orderby('receivedDateTime DESC')
+      client 
+        .api('https://graph.microsoft.com/v1.0/users/30be01d3-8214-4f2d-aea0-7028a19581fc/drive/sharedWithMe') //sharedWithMe
         .get((err, res) => {
           if (err) {
-            console.log('getUsers returned an error: ' + err);
+            console.log(err);
             response.write('<p>ERROR: ' + err + '</p>');
             response.end();
-          } else {
-          
+          } else {         
             response.write('');
-            // res.value.forEach(function(message) {
-            //   console.log('User: ' + message);
-              
-            //   response.write(message);
-            // });
-           // console.log(res.value);
-              
+
+            console.log(response.statusCode );
+            console.log(res.value);
+             console.log(res);
+          //  console.log(response.value);            
             response.end();
           }
         });
-
-        }
+  //getCurrentUserSP();
+//sharedWithMe();
+         }
 }
+
+// function getCurrentUserSP() {
+//   var ur = 'https://bouvetasa.sharepoint.com/_api/web/currentuser';
+//   var opt = {
+//     url: ur,
+//       method: "GET",
+//     header: {
+//       'User-Agent': 'Super Agent/0.0.1',
+//       'Content-Type': 'application/x-www-form-urlencoded',
+      
+//     }
+//   }
+ 
+//   request(opt, function (error, response, body) {
+//     if (!error && response.statusCode == 200) {
+//       console.log(error);
+//       return error;
+//     } else {
+//       //response.statusCode +s
+//       console.log( " " + response.value + body);
+//       return response;
+//     }
+//   });
+// }
+
+
+
+// function sharedWithMe() {
+//   var ur = 'https://bouvetasa.sharepoint.com/_api/search/query?querytext=%27(SharedWithUsersOWSUSER:trond.tufte@bouvet.no)%27';
+//   var opt = {
+//     url: ur,
+//   //    method: "GET",
+//     header: {
+//       'User-Agent': 'Super Agent/0.0.1',
+//       'Content-Type': 'application/x-www-form-urlencoded',
+      
+//     }
+//   }
+//   request(opt, function (error, response, body) {
+//     if (!error && response.statusCode == 200) {
+//       console.log(error);
+//       return error;
+//     } else {
+//       //response.statusCode +s
+//       console.log( " " + response.value + body);
+//       return response;
+//     }
+//   });
+// }
 
 
 function calendar(userId) {
   userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-
    var client = microsoftGraph.Client.init({
         authProvider: (done) => {
-          // Just return the token
           done(null, token);
         }
       });
@@ -179,7 +213,6 @@ function contacts(userId) {
 
    var client = microsoftGraph.Client.init({
         authProvider: (done) => {
-          // Just return the token
           done(null, token);
         }
       });
@@ -237,13 +270,9 @@ function updateProfilePicture() {
     
 function photoDownload(response, request, userId) {
 
-  // Get the profile photo of the current user (from the user's mailbox on Exchange Online).
-  // This operation in version 1.0 supports only work or school mailboxes, not personal mailboxes.
-  
    userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
-        // Just return the token
         done(null, token);
       }
     });
@@ -251,7 +280,6 @@ function photoDownload(response, request, userId) {
    client
       .api('users/'+userId+'/photo/$value')
       .responseType('blob')
-      //.get((err, res,rawResponse) => {
       .getStream((err, downloadStream) => {
         let writeStream = fs.createWriteStream('../myPhoto.jpg');
         downloadStream.pipe(writeStream).on('error', console.log);
@@ -269,5 +297,3 @@ function photoDownload(response, request, userId) {
         }
       });
 }
-
-
