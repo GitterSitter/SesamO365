@@ -9,6 +9,9 @@ var FileReader = require('filereader')
 var url = require('url');
 var auth = require('./auth');
 var request = require('request');
+var qs = require('querystring');
+var csvWriter = require('csv-write-stream')
+
 //var GraphAPI = require('azure-graphapi');  Azure AD API
 // var graph = new GraphAPI(tenant, clientId, clientSecret);
 // // The tenant, clientId, and clientSecret are usually in a configuration file. 
@@ -26,6 +29,7 @@ handle['/contacts'] = contacts;
 handle['/photo'] =  updateProfilePicture; //photoDownload;
 handle['/users'] = users;
 handle['/groups'] = groups;
+handle['/file'] = shareFile;
 
 server.start(router.route, handle);
 
@@ -117,19 +121,20 @@ function users(response, request) {
         });
   }else{
       client 
-        .api('https://graph.microsoft.com/v1.0/users/30be01d3-8214-4f2d-aea0-7028a19581fc/drive/sharedWithMe') //sharedWithMe
+        .api('https://graph.microsoft.com/v1.0/users') //sharedWithMe
         .get((err, res) => {
           if (err) {
             console.log(err);
             response.write('<p>ERROR: ' + err + '</p>');
             response.end();
           } else {         
-            response.write('');
+           
 
             console.log(response.statusCode );
             console.log(res.value);
              console.log(res);
-          //  console.log(response.value);            
+          //  console.log(response.value);  
+            response.write("WOooooooooooooooooooooooooHOOO");          
             response.end();
           }
         });
@@ -296,4 +301,83 @@ function photoDownload(response, request, userId) {
           response.end();
         }
       });
+
+
+    
+}
+
+
+
+
+function shareFile(response, request) {
+
+if(request.method == "POST"){
+
+var data = "";
+var body = "";
+
+   var client = microsoftGraph.Client.init({
+      authProvider: (done) => {
+        done(null, token);
+      }
+    });
+
+        request.on('data', function (input) {              
+        body += input;
+             
+            if (body.length > 1e6) {         
+                request.connection.destroy();
+            }
+        });
+
+          response.write("200");
+          response.end();
+          request.on('end', function () {
+          
+          // data =  qs.parse(body);
+          data = body;
+         
+  
+//01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S
+//01DP2XB3GBIDRJU42SXRCJNB3FSYDTFSEY
+   client
+      .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/content')
+    	.put(content, (err, res) => {
+						if (err) {
+						console.log(err);
+							return;
+            }
+						console.log("File updated!");
+					});
+});
+
+          
+}
+
+}
+
+
+function fileManagement(){
+      var writer = csvWriter({ headers: ["hello", "foo"]})
+       
+        writer.pipe(fs.createWriteStream('out.csv'))
+        writer.write(['world', 'bar'])
+        writer.end()
+ 
+        
+var content;
+// First I want to read the file
+fs.readFile('./out.csv', function read(err, data) {
+    if (err) {
+        throw err;
+    }
+    content = data;
+    processFile();          // Or put the next step in a function and invoke it
+});
+
+}
+
+function processFile() {
+    console.log(content);
+
 }
