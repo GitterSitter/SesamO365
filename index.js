@@ -308,9 +308,7 @@ function photoDownload(response, request, userId) {
 
 
 
-
 function shareFile(response, request) {
-
 if(request.method == "POST"){
 
 var data = "";
@@ -337,7 +335,6 @@ var body = "";
           // data =  qs.parse(body);
           data = body;
          
-  
 //01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S
 //01DP2XB3GBIDRJU42SXRCJNB3FSYDTFSEY
    client
