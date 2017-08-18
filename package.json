@@ -1,4 +1,12 @@
 {
+  "name": "node-office",
+  "version": "1.0.0",
+  "description": "Node.js Webservice for O365",
+  "author": "Trond Tufte",
+  "main": "index.js",
+  "scripts": {
+    "start": "node index.js"
+  },
   "dependencies": {
     "@microsoft/microsoft-graph-client": "^0.4.0",
     "csv-write-stream": "^2.0.0",
