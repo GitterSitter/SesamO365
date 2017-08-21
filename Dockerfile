@@ -1,4 +1,4 @@
-FROM node:4-slim
+FROM node:6
 MAINTAINER Trond "trond.tufte@bouvet.no"
 ADD . /node-office 
 WORKDIR /node-office
