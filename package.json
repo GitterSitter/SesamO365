@@ -12,6 +12,7 @@
     "csv-write-stream": "^2.0.0",
     "es6-promise": "^4.1.0",
     "filereader": "^0.10.3",
+    "q": "^1.5.0",
     "qs": "^6.5.0",
     "request": "^2.81.0",
     "simple-oauth2": "^1.0.1"
