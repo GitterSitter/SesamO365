@@ -273,38 +273,38 @@ function updateProfilePicture() {
   
     }
     
-function photoDownload(response, request, userId) {
+// function photoDownload(response, request, userId) {
 
-   userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-    var client = microsoftGraph.Client.init({
-      authProvider: (done) => {
-        done(null, token);
-      }
-    });
+//    userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
+//     var client = microsoftGraph.Client.init({
+//       authProvider: (done) => {
+//         done(null, token);
+//       }
+//     });
 
-   client
-      .api('users/'+userId+'/photo/$value')
-      .responseType('blob')
-      .getStream((err, downloadStream) => {
-        let writeStream = fs.createWriteStream('../myPhoto.jpg');
-        downloadStream.pipe(writeStream).on('error', console.log);
+//    client
+//       .api('users/'+userId+'/photo/$value')
+//       .responseType('blob')
+//       .getStream((err, downloadStream) => {
+//         let writeStream = fs.createWriteStream('../myPhoto.jpg');
+//         downloadStream.pipe(writeStream).on('error', console.log);
     
-        if (err) {
-          console.log('error: ' + err);
-          response.write('<p>ERROR: ' + err + '</p>');
-          response.end();
-        } else {   
+//         if (err) {
+//           console.log('error: ' + err);
+//           response.write('<p>ERROR: ' + err + '</p>');
+//           response.end();
+//         } else {   
 
-      // let profilePhotoReadStream = fs.createReadStream('me.jpg');
-        //  console.log(downloadStream);
-        console.log("Image downloaded!")
-          response.end();
-        }
-      });
+//       // let profilePhotoReadStream = fs.createReadStream('me.jpg');
+//         //  console.log(downloadStream);
+//         console.log("Image downloaded!")
+//           response.end();
+//         }
+//       });
 
 
     
-}
+// }
 
 
 
