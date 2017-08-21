@@ -9,6 +9,7 @@ var clientSecret = process.env.Token_Node_Office;
 // The auth module object.
 var auth = {};
 
+
 // @name getAccessToken
 // @desc Makes a request for a token using client credentials.
 auth.getAccessToken = function () {
