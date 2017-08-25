@@ -333,45 +333,101 @@ var body = "";
           response.end();
           request.on('end', function () {
           
-          // data =  qs.parse(body);
+          // data =  qs.parse(body); 
           data = body;
          
-//01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S
-//01DP2XB3GBIDRJU42SXRCJNB3FSYDTFSEY
-   client
-      .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')
-      //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/out.csv/content')
-    	.put(data, (err, res) => {
-						if (err) {
-						console.log(err);
-							return;
-            }
-						console.log("File updated!");
-					});
-});
+          var test = JSON.parse(data);
+
+          var depName = test["bouvet-org-map:DepartmentName"];
+          var depId = test["bouvet-org-map:DepartmentId"];
+          var name = test["bouvet-org-map:DepartmentHead"]["bouvet-org-map:Navn"];
+          var parentName = test ["bouvet-org-map:ParentDepartment"][0]["bouvet-org-map:ParentName"][0];
+
+
+          var writer = csvWriter({ headers: ["DepartmentId","DepartmentName", "ParentDepartment","Navn"]})           
+             writer.pipe(fs.createWriteStream('out.csv'))
+             writer.write([depId,depName,parentName,name ])
+             writer.end()
       
-}
+      //    console.log(output);
 
-}
-
-function fileManagement(){
-   
-  // var writer = csvWriter({ headers: ["hello", "foo"]})
-  //       writer.pipe(fs.createWriteStream('out.csv'))
-  //       writer.write(['world', 'bar'])
-  //       writer.end()
- 
-var content;
-// First I want to read the file
-fs.readFile('./out.csv', function read(err, data) { 
-  if (err) {
-        throw err;
-    }
-    content = data;
-    processFile();         
 });
-}
-function processFile() {
-    console.log(content);
+
+
+  // var output = readFile();
+  //console.log(output + " result");
+  fs.readFile("./out.csv","utf8",  function(err, data) {
+   // data = data.toString('ascii', 0, data.length);
+//"utf8",
+data = "\ufeff"+data;
+console.log(data);
+      if (err) {
+       throw err;
+            }else {
+              console.log(data);
+              client
+              
+              .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')
+              
+              //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/out.csv/content')     
+              .put(data, (err, res) => {
+                    if (err) {
+                    console.log(err);
+                      return;
+                    }
+                    console.log("File updated!");
+                  });
+
+          
+            }
+     // content = data;  //.toString('ascii', 0, data.length);
+    
+    });
 
 }
+
+}
+
+
+
+
+function readFile(){
+   
+var content = "";
+fs.readFile("./out.csv", "utf8", function(err, data) {
+
+  if (err) {
+   throw err;
+        }else {
+          console.log(data);
+          return data;
+        }
+ // content = data;  //.toString('ascii', 0, data.length);
+
+});
+
+// var array = fs.readFileSync('./out.csv').toString().split("\n");
+// for(i in array) {
+//     console.log(array[i]);
+// }
+
+// fs.readFile('./out.csv', function read(err, data) { 
+//   if (err) {
+//         throw err;
+//     }
+//     content = data;
+//     // console.log(content);
+//     processFile(content);         
+// });
+
+}
+
+
+
+
+
+
+// function processFile(content) {
+//     console.log(content);
+
+// }
