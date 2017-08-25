@@ -338,37 +338,42 @@ var body = "";
          
           var test = JSON.parse(data);
 
-          var depName = test["bouvet-org-map:DepartmentName"];
-          var depId = test["bouvet-org-map:DepartmentId"];
-          var name = test["bouvet-org-map:DepartmentHead"]["bouvet-org-map:Navn"];
-          var parentName = test ["bouvet-org-map:ParentDepartment"][0]["bouvet-org-map:ParentName"][0];
+          console.log("");
 
+         var writer = csvWriter({ headers: ["DepartmentId","DepartmentName", "ParentDepartment","Navn"]})           
+         writer.pipe(fs.createWriteStream('out.csv'))
 
-          var writer = csvWriter({ headers: ["DepartmentId","DepartmentName", "ParentDepartment","Navn"]})           
-             writer.pipe(fs.createWriteStream('out.csv'))
-             writer.write([depId,depName,parentName,name ])
-             writer.end()
+         test.forEach(function(element) {
+           
+          var depName = element["bouvet-org-map:DepartmentName"];
+          var depId = element["bouvet-org-map:DepartmentId"];
+          var name = element["bouvet-org-map:DepartmentHead"]["bouvet-org-map:Navn"];
+          var parentName = element ["bouvet-org-map:ParentDepartment"][0]["bouvet-org-map:ParentName"][0];
+          writer.write([depId,depName,parentName,name ])
+
+         }, this);
+
+         writer.end()
+         
+
+           
       
       //    console.log(output);
 
 });
-
-
   // var output = readFile();
   //console.log(output + " result");
   fs.readFile("./out.csv","utf8",  function(err, data) {
    // data = data.toString('ascii', 0, data.length);
-//"utf8",
+   //"utf8",
 data = "\ufeff"+data;
 console.log(data);
       if (err) {
        throw err;
             }else {
               console.log(data);
-              client
-              
-              .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')
-              
+              client         
+              .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')      
               //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/out.csv/content')     
               .put(data, (err, res) => {
                     if (err) {
@@ -376,16 +381,13 @@ console.log(data);
                       return;
                     }
                     console.log("File updated!");
-                  });
-
-          
+                  });       
             }
      // content = data;  //.toString('ascii', 0, data.length);
     
     });
 
-}
-
+  }
 }
 
 
