@@ -39,6 +39,9 @@ function saveToken(tok){
 token = tok;
 }
 
+
+
+//If expired, request new token in the methods!
 auth.getAccessToken().then(function (token) {
    // console.log(token);
   saveToken(token)
@@ -310,8 +313,8 @@ function updateProfilePicture() {
 
 
 function shareFile(response, request) {
-if(request.method == "POST"){
 
+  if(request.method == "POST"){
 var data = "";
 var body = "";
 
@@ -322,8 +325,7 @@ var body = "";
     });
 
         request.on('data', function (input) {              
-        body += input;
-             
+        body += input;           
             if (body.length > 1e6) {         
                 request.connection.destroy();
             }
@@ -331,14 +333,13 @@ var body = "";
 
           response.write("200");
           response.end();
-          request.on('end', function () {
-          
+          request.on('end', function () {         
           // data =  qs.parse(body); 
-          data = body;
-         
-          var test = JSON.parse(data);
+          data = body;     
 
-          console.log("");
+          console.log(data);
+
+          var test = JSON.parse(data);
 
          var writer = csvWriter({ headers: ["DepartmentId","DepartmentName", "ParentDepartment","Navn"]})           
          writer.pipe(fs.createWriteStream('out.csv'))
@@ -349,31 +350,24 @@ var body = "";
           var depId = element["bouvet-org-map:DepartmentId"];
           var name = element["bouvet-org-map:DepartmentHead"]["bouvet-org-map:Navn"];
           var parentName = element ["bouvet-org-map:ParentDepartment"][0]["bouvet-org-map:ParentName"][0];
-          writer.write([depId,depName,parentName,name ])
+          writer.write([depId,depName,parentName,name])
 
          }, this);
-
-         writer.end()
-         
-
-           
-      
-      //    console.log(output);
+         writer.end()    
 
 });
-  // var output = readFile();
-  //console.log(output + " result");
+
   fs.readFile("./out.csv","utf8",  function(err, data) {
    // data = data.toString('ascii', 0, data.length);
    //"utf8",
 data = "\ufeff"+data;
-console.log(data);
       if (err) {
        throw err;
             }else {
               console.log(data);
-              client         
-              .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')      
+              client    
+              .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/out.csv/content')         
+         //     .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')      
               //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/out.csv/content')     
               .put(data, (err, res) => {
                     if (err) {
@@ -383,7 +377,6 @@ console.log(data);
                     console.log("File updated!");
                   });       
             }
-     // content = data;  //.toString('ascii', 0, data.length);
     
     });
 
@@ -401,7 +394,7 @@ fs.readFile("./out.csv", "utf8", function(err, data) {
   if (err) {
    throw err;
         }else {
-          console.log(data);
+        //  console.log(data);
           return data;
         }
  // content = data;  //.toString('ascii', 0, data.length);
