@@ -329,7 +329,6 @@ var body = "";
 
          var writer = csvWriter({ headers: ["DepartmentId","DepartmentName", "ParentDepartment","Navn"]})           
          writer.pipe(fs.createWriteStream('out.csv'))
-
          test.forEach(function(element) {
            
           var depName = element["bouvet-org-map:DepartmentName"];
@@ -371,9 +370,7 @@ data = "\ufeff"+data;
 
 
 
-
 function readFile(){
-   
 var content = "";
 fs.readFile("./out.csv", "utf8", function(err, data) {
 
@@ -402,10 +399,6 @@ fs.readFile("./out.csv", "utf8", function(err, data) {
 // });
 
 }
-
-
-
-
 
 
 // function processFile(content) {
