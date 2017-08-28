@@ -12,15 +12,6 @@ var request = require('request');
 var qs = require('querystring');
 var csvWriter = require('csv-write-stream')
 
-//var GraphAPI = require('azure-graphapi');  Azure AD API
-// var graph = new GraphAPI(tenant, clientId, clientSecret);
-// // The tenant, clientId, and clientSecret are usually in a configuration file. 
-// graph.get('users/a8272675-dc21-4ff4-bc8d-8647830fa7db', function(err, user) {
-//     if (!err) {
-//         console.dir(user);
-//     }
-// }
-
 var handle = {};
 handle['/mail'] = userEmail;
 handle['/calendar'] = calendar;
@@ -33,6 +24,7 @@ handle['/file'] = shareFile;
 server.start(router.route, handle);
 
 var token = "";
+
 function saveToken(tok){
 token = tok;
 }
@@ -41,7 +33,7 @@ token = tok;
 //If expired, request new token in the methods!
 auth.getAccessToken().then(function (token) {
    // console.log(token);
-  saveToken(token)
+    saveToken(token)
     .then(function (tok) {    
     }, function (error) { 
       console.error('>>> Error getting users: ' + error);
@@ -325,7 +317,7 @@ var body = "";
 
           console.log(data);
 
-          var test = JSON.parse(data);
+         var test = JSON.parse(data);
 
          var writer = csvWriter({ headers: ["DepartmentId","DepartmentName", "ParentDepartment","Navn"]})           
          writer.pipe(fs.createWriteStream('out.csv'))
@@ -345,7 +337,6 @@ var body = "";
   fs.readFile("./out.csv","utf8",  function(err, data) {
    // data = data.toString('ascii', 0, data.length);
    //"utf8",
-   
 data = "\ufeff"+data;
       if (err) {
        throw err;
@@ -365,16 +356,12 @@ data = "\ufeff"+data;
             }
     
     });
-
   }
 }
-
-
 
 function readFile(){
 var content = "";
 fs.readFile("./out.csv", "utf8", function(err, data) {
-
   if (err) {
    throw err;
         }else {
@@ -382,7 +369,6 @@ fs.readFile("./out.csv", "utf8", function(err, data) {
           return data;
         }
  // content = data;  //.toString('ascii', 0, data.length);
-
 });
 
 // var array = fs.readFileSync('./out.csv').toString().split("\n");
@@ -401,8 +387,6 @@ fs.readFile("./out.csv", "utf8", function(err, data) {
 
 }
 
-
 // function processFile(content) {
 //     console.log(content);
-
 // }
