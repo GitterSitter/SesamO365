@@ -15,19 +15,17 @@ var csvWriter = require('csv-write-stream')
 //var GraphAPI = require('azure-graphapi');  Azure AD API
 // var graph = new GraphAPI(tenant, clientId, clientSecret);
 // // The tenant, clientId, and clientSecret are usually in a configuration file. 
- 
 // graph.get('users/a8272675-dc21-4ff4-bc8d-8647830fa7db', function(err, user) {
 //     if (!err) {
 //         console.dir(user);
 //     }
 // }
 
-
 var handle = {};
 handle['/mail'] = userEmail;
 handle['/calendar'] = calendar;
 handle['/contacts'] = contacts;
-handle['/photo'] =  updateProfilePicture; //photoDownload;
+handle['/photo'] =  updateProfilePicture; 
 handle['/users'] = users;
 handle['/groups'] = groups;
 handle['/file'] = shareFile;
@@ -40,14 +38,11 @@ token = tok;
 }
 
 
-
 //If expired, request new token in the methods!
 auth.getAccessToken().then(function (token) {
    // console.log(token);
   saveToken(token)
     .then(function (tok) {    
-      // Create an event on each user's calendar.
-     // graph.createEvent(token, users);
     }, function (error) { 
       console.error('>>> Error getting users: ' + error);
     });
@@ -56,9 +51,9 @@ auth.getAccessToken().then(function (token) {
 });
 
 
+
 function userEmail(userId){
 userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
@@ -74,8 +69,8 @@ userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
        console.log(res.value);     
       }     
     });
-
 }
+
 
 function groups (response,request){
  var client = microsoftGraph.Client.init({
@@ -83,14 +78,18 @@ function groups (response,request){
           done(null, token);
         }
       });
-        client.api("/groups/") 
+        client.api("/groups") 
       .get((err, res) => {
           if (err) {
             console.log(err);
-          } else {         
-            console.log(response.statusCode );
+            response.write('<p>ERROR: ' + err + '</p>');
+            response.end();
+          } else {      
+             
+            console.log(res.statusCode );
             console.log(res.value);
-             console.log(res);
+            response.write(JSON.stringify(res.value));
+            response.end();  
           }
         });
 
@@ -106,15 +105,12 @@ function users(response, request) {
           done(null, token);
         }
       });
- //users/30be01d3-8214-4f2d-aea0-7028a19581fc/mobilePhone               
-  //request.method
-
   //tlf nr funker! /mobilePhone
 //If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
   //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
   //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
   if(request.method == "POST"){
-    client.api("/users/"+userId+"/displayName")  //Skaflestad britt.skaflestad@bouvet.no
+    client.api("/users/"+userId+"/displayName") 
        .patch(
         {"value": "Test"},
         (err, res) => {
@@ -125,21 +121,17 @@ function users(response, request) {
         });
   }else{
       client 
-        .api('https://graph.microsoft.com/v1.0/users') //sharedWithMe
+        .api('https://graph.microsoft.com/v1.0/users') 
         .get((err, res) => {
           if (err) {
             console.log(err);
             response.write('<p>ERROR: ' + err + '</p>');
             response.end();
-          } else {         
-           
-
-            console.log(response.statusCode );
+          } else {              
+            console.log(response.statusCode );                
             console.log(res.value);
-             console.log(res);
-          //  console.log(response.value);  
-            response.write("WOooooooooooooooooooooooooHOOO");          
-            response.end();
+            response.write(JSON.stringify(res.value));
+            response.end();  
           }
         });
   //getCurrentUserSP();
@@ -158,7 +150,6 @@ function users(response, request) {
       
 //     }
 //   }
- 
 //   request(opt, function (error, response, body) {
 //     if (!error && response.statusCode == 200) {
 //       console.log(error);
@@ -171,8 +162,6 @@ function users(response, request) {
 //   });
 // }
 
-
-
 // function sharedWithMe() {
 //   var ur = 'https://bouvetasa.sharepoint.com/_api/search/query?querytext=%27(SharedWithUsersOWSUSER:trond.tufte@bouvet.no)%27';
 //   var opt = {
@@ -180,8 +169,7 @@ function users(response, request) {
 //   //    method: "GET",
 //     header: {
 //       'User-Agent': 'Super Agent/0.0.1',
-//       'Content-Type': 'application/x-www-form-urlencoded',
-      
+//       'Content-Type': 'application/x-www-form-urlencoded',     
 //     }
 //   }
 //   request(opt, function (error, response, body) {
@@ -305,9 +293,7 @@ function updateProfilePicture() {
 //           response.end();
 //         }
 //       });
-
-
-    
+   
 // }
 
 
