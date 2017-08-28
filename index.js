@@ -345,6 +345,7 @@ var body = "";
   fs.readFile("./out.csv","utf8",  function(err, data) {
    // data = data.toString('ascii', 0, data.length);
    //"utf8",
+   
 data = "\ufeff"+data;
       if (err) {
        throw err;
