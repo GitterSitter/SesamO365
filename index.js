@@ -341,7 +341,7 @@ function shareFile(response, request) {
     });
 
 
-    fs.readFile("./out.csv", "utf8", function (err, data) {
+    fs.readFileSync("./out.csv", "utf8", function (err, data) {
       data = "\ufeff" + data;
       if (err) {
         throw err;
