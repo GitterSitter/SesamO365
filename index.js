@@ -33,7 +33,7 @@ function saveToken(tok) {
 //If expired, request new token in the methods!
 auth.getAccessToken().then(function (token) {
   // console.log(token);
-  saveToken(token)
+    saveToken(token)
     .then(function (tok) {
     }, function (error) {
       console.error('>>> Error getting users: ' + error);
@@ -292,6 +292,19 @@ function updateProfilePicture() {
 
 function shareFile(response, request) {
   if (request.method == "POST") {
+
+    auth.getAccessToken().then(function (token) {
+      // console.log(token);
+        saveToken(token)
+        .then(function (tok) {
+        }, function (error) {
+          console.error('>>> Error getting users: ' + error);
+        });
+    }, function (error) {
+      console.error('>>> Error getting access token: ' + error);
+    });
+
+
     var data = "";
     var body = "";
 
