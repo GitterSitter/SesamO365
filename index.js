@@ -331,9 +331,10 @@ function shareFile(response, request) {
         }else {
           name = "NA"
         }
+
         var parentName = "";
 
-        if (element["ParentDepartment"][0] != null  || element["ParentDepartment"][0] != "undefined"){
+        if (element["ParentDepartment"] != 0){
           parentName = element["ParentDepartment"][0]["ParentName"][0];
         }
      
