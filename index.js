@@ -315,7 +315,7 @@ function shareFile(response, request) {
     request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
-    //  var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
+      var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
       writer.pipe(fs.createWriteStream('out.csv', {flags: 'a'}))
       dataArray.forEach(function (element) {
 
