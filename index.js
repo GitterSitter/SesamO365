@@ -353,7 +353,7 @@ function shareFile(response, request) {
           .top(10)    
           .put(data, (err, res) => {
             if (err) {
-              throw err;
+              console.log(err);
             }else {
               console.log("File updated!");
             }
