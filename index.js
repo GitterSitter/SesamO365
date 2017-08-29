@@ -306,6 +306,7 @@ function shareFile(response, request) {
       if (body.length > 1e6) {
         request.connection.destroy();
       }
+
     });
 
     response.write("200");
@@ -314,14 +315,18 @@ function shareFile(response, request) {
     request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
-      var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
+    //  var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
       writer.pipe(fs.createWriteStream('out.csv', {flags: 'a'}))
       dataArray.forEach(function (element) {
 
         var depName = element["DepartmentName"];
-        var depId = element["DepartmentId"];
-        var name = "";
 
+        var depId = "";
+        if(element["DepartmentId"] != "_Scurrenttime-department:departmentref"){
+          depId = element["DepartmentId"];
+        }
+      
+        var name = "";
         if(element["DepartmentHead"] != null){
           name = element["DepartmentHead"]["Navn"];
         }else {
