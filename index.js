@@ -352,10 +352,12 @@ function shareFile(response, request) {
         throw err;
       } else {
         client
-          .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/out.csv/content')
+        .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/out.csv/content')
+        //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/out.csv/content')
+
           //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')      
           //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/out.csv/content') 
-          .top(10)    
+        //  .top(10) 
           .put(data, (err, res) => {
             if (err) {
               console.log(err);
