@@ -322,10 +322,10 @@ function shareFile(response, request) {
       writer.pipe(fs.createWriteStream('out.csv'))
       test.forEach(function (element) {
 
-        var depName = element["bouvet-org-map:DepartmentName"];
-        var depId = element["bouvet-org-map:DepartmentId"];
-        var name = element["bouvet-org-map:DepartmentHead"]["bouvet-org-map:Navn"];
-        var parentName = element["bouvet-org-map:ParentDepartment"][0]["bouvet-org-map:ParentName"][0];
+        var depName = element["DepartmentName"];
+        var depId = element["DepartmentId"];
+        var name = element["DepartmentHead"]["Navn"];
+        var parentName = element["ParentDepartment"][0]["ParentName"][0];
         writer.write([depId, depName, parentName, name])
 
       }, this);
