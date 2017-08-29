@@ -311,11 +311,9 @@ function shareFile(response, request) {
     response.write("200");
     response.end();
 
-
     request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
-
       var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
       writer.pipe(fs.createWriteStream('out.csv'))
       dataArray.forEach(function (element) {
@@ -341,7 +339,7 @@ function shareFile(response, request) {
     });
 
 
-    fs.readFileSync("./out.csv", "utf8", function (err, data) {
+    fs.readFile("./out.csv", "utf8", function (err, data) {
       data = "\ufeff" + data;
       if (err) {
         throw err;
