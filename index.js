@@ -333,7 +333,7 @@ function shareFile(response, request) {
         }
         var parentName = "";
 
-        if (element["ParentDepartment"][0]["ParentName"][0] != null  || element["ParentDepartment"][0]["ParentName"][0] != "undefined"){
+        if (element["ParentDepartment"][0] != null  || element["ParentDepartment"][0] != "undefined"){
           parentName = element["ParentDepartment"][0]["ParentName"][0];
         }
      
