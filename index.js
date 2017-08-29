@@ -311,14 +311,14 @@ function shareFile(response, request) {
 
     response.write("200");
     response.end();
-
+    
     request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
       // var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
       var writer = csvWriter({ headers: ["", "", "", ""] })
     //  var writer = csvWriter({sendHeaders: false});
-      writer.pipe(fs.createWriteStream('out.csv', {flags: 'a'}))
+      writer.pipe(fs.createWriteStream('orgMap.csv', {flags: 'a'}))
       dataArray.forEach(function (element) {
 
         var depName = element["DepartmentName"];
@@ -346,28 +346,26 @@ function shareFile(response, request) {
     });
 
 
-    fs.readFile("./out.csv", "utf8", function (err, data) {
+    fs.readFile("./orgMap.csv", "utf8", function (err, data) {
       data = "\ufeff" + data;
       if (err) {
         throw err;
       } else {
         client
-        .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/out.csv/content')
-        //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/out.csv/content')
+        .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
+        //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')
 
           //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')      
-          //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/out.csv/content') 
+          //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/orgMap.csv/content') 
         //  .top(10) 
           .put(data, (err, res) => {
             if (err) {
               console.log(err);
             }else {
               console.log("File updated!");
-            }
-           
+            }         
           });
       }
-
     });
   }
 }
