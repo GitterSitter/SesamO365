@@ -119,11 +119,8 @@ function users(response, request) {
         } else {
           console.log(response.statusCode);
          response.writeHead(200, { "Content-Type": "application/json" });   
-        // response.end(JSON.stringify(res.value));
-        var test = []; 
-        test = res.value;
-       
-        response.end(JSON.stringify(test[0]));
+         response.end(JSON.stringify(res.value));
+     
         }
       });
    
