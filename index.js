@@ -120,7 +120,8 @@ function users(response, request) {
         } else {
           console.log(response.statusCode);
          // console.log(res.value);
-    //       response.writeHead(200);     
+    //       response.writeHead(200); 
+         response.writeHead(200, { "Content-Type": "application/json" });   
          response.end(JSON.stringify(res.value));
       
         }
