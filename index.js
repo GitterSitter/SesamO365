@@ -122,7 +122,9 @@ function users(response, request) {
          // console.log(res.value);
            response.writeHead(200);
          // response.write(JSON.stringify(res.value));
-          response.end(JSON.stringify(res.value));
+
+        //  response.end(JSON.stringify(res.value));
+        response.end(res.value);
         }
       });
     //getCurrentUserSP();
