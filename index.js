@@ -88,19 +88,18 @@ function groups(response, request) {
 
 
 function users(response, request) {
-  console.log(request.method);
-  var userId = "e97f274a-2a86-4280-997d-8ee4d2c52078"; //"30be01d3-8214-4f2d-aea0-7028a19581fc" ;//"e97f274a-2a86-4280-997d-8ee4d2c52078";
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
-      // Just return the token
       done(null, token);
     }
   });
+
   //tlf nr funker! /mobilePhone
   //If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
   //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
   //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
   if (request.method == "POST") {
+    var userId = "e97f274a-2a86-4280-997d-8ee4d2c52078"; 
     client.api("/users/" + userId + "/displayName")
       .patch(
       { "value": "Test" },
@@ -116,7 +115,7 @@ function users(response, request) {
       .get((err, res) => {
         if (err) {
           console.log(err);
-          response.write('<p>ERROR: ' + err + '</p>');
+          response.write('<p>ERROR: '+ err +'</p>');
           response.end();
         } else {
           console.log(response.statusCode);
@@ -175,7 +174,6 @@ function users(response, request) {
 //   });
 // }
 
-
 function calendar(userId) {
   userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
   var client = microsoftGraph.Client.init({
@@ -187,7 +185,6 @@ function calendar(userId) {
     .api('/users/' + userId + '/events')
     .get((err, res) => {
       if (err) {
-
         console.log(err);
       } else {
         console.log(res.value);
@@ -198,7 +195,6 @@ function calendar(userId) {
 
 function contacts(userId) {
   userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
@@ -288,13 +284,11 @@ function updateProfilePicture() {
 // }
 
 
-
 function shareFile(response, request) {
   if (request.method == "POST") {
 
     var data = "";
     var body = "";
-
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
         done(null, token);
@@ -317,7 +311,6 @@ function shareFile(response, request) {
       var dataArray = JSON.parse(data);
       // var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
       var writer = csvWriter({ headers: ["", "", "", ""] })
-    //  var writer = csvWriter({sendHeaders: false});
       writer.pipe(fs.createWriteStream('orgMap.csv', {flags: 'a'}))
       dataArray.forEach(function (element) {
 
@@ -354,7 +347,6 @@ function shareFile(response, request) {
         client
         .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
         //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')
-
           //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')      
           //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/orgMap.csv/content') 
         //  .top(10) 
