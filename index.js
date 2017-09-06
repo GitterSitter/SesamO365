@@ -109,7 +109,7 @@ function users(response, request) {
         else
           console.log("Profile Updated");
       });
-  } else {
+  } else if(request.method == "GET") {
     client
       .api('https://graph.microsoft.com/v1.0/users')
       .get((err, res) => {
@@ -119,7 +119,7 @@ function users(response, request) {
           response.end();
         } else {
           console.log(response.statusCode);
-          console.log(res.value);
+         // console.log(res.value);
           response.write(JSON.stringify(res.value));
           response.end();
         }
@@ -204,7 +204,6 @@ function contacts(userId) {
     .api('/users/' + userId + '/contacts')
     .get((err, res) => {
       if (err) {
-
         console.log(err);
       } else {
         console.log(res.value);
