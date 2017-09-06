@@ -78,7 +78,6 @@ function groups(response, request) {
       } else {
 
         console.log(res.statusCode);
-        console.log(res.value);
         response.write(JSON.stringify(res.value));
         response.end();
       }
@@ -119,15 +118,15 @@ function users(response, request) {
           response.end();
         } else {
           console.log(response.statusCode);
-         // console.log(res.value);
-    //       response.writeHead(200); 
          response.writeHead(200, { "Content-Type": "application/json" });   
-         response.end(JSON.stringify(res.value));
-      
+        // response.end(JSON.stringify(res.value));
+        var test = []; 
+        test = res.value;
+       
+        response.end(JSON.stringify(test[0]));
         }
       });
-    //getCurrentUserSP();
-    //sharedWithMe();
+   
   }
 }
 
