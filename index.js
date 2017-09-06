@@ -120,8 +120,9 @@ function users(response, request) {
         } else {
           console.log(response.statusCode);
          // console.log(res.value);
-          response.write(JSON.stringify(res.value));
-          response.end();
+           response.writeHead(200);
+         // response.write(JSON.stringify(res.value));
+          response.end(JSON.stringify(res.value));
         }
       });
     //getCurrentUserSP();
