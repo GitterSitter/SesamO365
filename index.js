@@ -77,9 +77,9 @@ function groups(response, request) {
         response.end();
       } else {
 
-        console.log(res.statusCode);
-        response.write(JSON.stringify(res.value));
-        response.end();
+      console.log(res.statusCode);
+      response.writeHead(200, { "Content-Type": "application/json" });   
+      response.end(JSON.stringify(res.value));
       }
     });
 
@@ -93,11 +93,13 @@ function users(response, request) {
     }
   });
 
+
+  if (request.method == "POST") {
+
   //tlf nr funker! /mobilePhone
   //If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
   //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
   //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
-  if (request.method == "POST") {
     var userId = "e97f274a-2a86-4280-997d-8ee4d2c52078"; 
     client.api("/users/" + userId + "/displayName")
       .patch(
