@@ -112,7 +112,8 @@ function users(response, request) {
       });
   } else if(request.method == "GET") {
     client
-      .api('https://graph.microsoft.com/v1.0/users')
+      .api('https://graph.microsoft.com/beta/users')
+   //   .api('https://graph.microsoft.com/v1.0/users?$select=*')
       .get((err, res) => {
         if (err) {
           console.log(err);
