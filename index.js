@@ -114,6 +114,7 @@ function users(response, request) {
     client
       .api('https://graph.microsoft.com/beta/users')
    //   .api('https://graph.microsoft.com/v1.0/users?$select=*')
+   .top(999)
       .get((err, res) => {
         if (err) {
           console.log(err);
