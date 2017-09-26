@@ -43,6 +43,26 @@ auth.getAccessToken().then(function (token) {
 
 
 
+
+function getNewToken(){
+  auth.getAccessToken().then(function (token) {
+      saveToken(token)
+      .then(function (tok) {
+      }, function (error) {
+        console.error('>>> Error getting users: ' + error);
+      });
+  }, function (error) {
+    console.error('>>> Error getting access token: ' + error);
+  });
+}
+
+
+
+
+
+
+
+
 function userEmail(userId) {
   userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
   var client = microsoftGraph.Client.init({
@@ -64,35 +84,36 @@ function userEmail(userId) {
 
 
 function groups(response, request) {
+  getNewToken();
+ 
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
     }
   });
+
+  response.writeHead(200, { "Content-Type": "application/json" }); 
   client.api("/groups")
     .get((err, res) => {
       if (err) {
         console.log(err);
-        response.write('<p>ERROR: ' + err + '</p>');
-        response.end();
+        response.end(res.statusCode);
       } else {
-
-      console.log(res.statusCode);
-      response.writeHead(200, { "Content-Type": "application/json" });   
+      console.log(res.statusCode); 
       response.end(JSON.stringify(res.value));
       }
     });
-
 }
 
 
 function users(response, request) {
+  getNewToken();
+
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
     }
   });
-
 
   if (request.method == "POST") {
 
@@ -100,7 +121,8 @@ function users(response, request) {
   //If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
   //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
   //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
-    var userId = "e97f274a-2a86-4280-997d-8ee4d2c52078"; 
+
+    var userId = request.data;   //"e97f274a-2a86-4280-997d-8ee4d2c52078"; 
     client.api("/users/" + userId + "/displayName")
       .patch(
       { "value": "Test" },
@@ -111,19 +133,20 @@ function users(response, request) {
           console.log("Profile Updated");
       });
   } else if(request.method == "GET") {
+    response.writeHead(200, { "Content-Type": "application/json" });   
     client
-      .api('https://graph.microsoft.com/beta/users')
-   //   .api('https://graph.microsoft.com/v1.0/users?$select=*')
+     .api('https://graph.microsoft.com/beta/users')
+   //.api('https://graph.microsoft.com/v1.0/users?$select=*')
    .top(999)
       .get((err, res) => {
         if (err) {
           console.log(err);
-          response.write('<p>ERROR: '+ err +'</p>');
+          response.write(""+ res.statusCode + " - " + err);
           response.end();
         } else {
-          console.log(response.statusCode);
-         response.writeHead(200, { "Content-Type": "application/json" });   
-         response.end(JSON.stringify(res.value));
+          
+        console.log(response.statusCode);   
+        response.end(JSON.stringify(res.value));
      
         }
       });
@@ -215,7 +238,7 @@ function contacts(userId) {
 }
 
 
-function updateProfilePicture() {
+function updateProfilePicture(response, request) {
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       // Just return the token
@@ -223,7 +246,9 @@ function updateProfilePicture() {
     }
   });
 
-  var userId = "30be01d3-8214-4f2d-aea0-7028a19581fc";  //(britt)    "8fa20769-13f0-4b67-b777-c262b174d93e"; (Eirik?)  //e97f274a-2a86-4280-997d-8ee4d2c52078  (min)
+
+
+ //var userId = "50e2882f-56d1-4d62-892a-e62d999fce7f"; //"30be01d3-8214-4f2d-aea0-7028a19581fc";  //(britt)    "8fa20769-13f0-4b67-b777-c262b174d93e"; (Eirik?)  //e97f274a-2a86-4280-997d-8ee4d2c52078  (min)
   var file = fs.readFileSync('./logo.png'); // fs.openSync("logo.png","r"); //new File("logo.png");       
   //var reader = new FileReader();
   client
@@ -233,6 +258,7 @@ function updateProfilePicture() {
         console.log(err);
         return;
       }
+      response.end("Image updated!");
       console.log("Image updated!");
     });
 
@@ -287,7 +313,6 @@ function updateProfilePicture() {
 
 function shareFile(response, request) {
   if (request.method == "POST") {
-
     var data = "";
     var body = "";
     var client = microsoftGraph.Client.init({
