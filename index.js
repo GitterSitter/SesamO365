@@ -93,7 +93,7 @@ function groups(response, request) {
   });
 
   response.writeHead(200, { "Content-Type": "application/json" }); 
-  client.api("/groups")
+  client.api("https://graph.microsoft.com/beta/groups")
     .get((err, res) => {
       if (err) {
         console.log(err);
@@ -137,17 +137,15 @@ function users(response, request) {
     client
      .api('https://graph.microsoft.com/beta/users')
    //.api('https://graph.microsoft.com/v1.0/users?$select=*')
-   .top(999)
+   //.top(999)
       .get((err, res) => {
         if (err) {
           console.log(err);
-          response.write(""+ res.statusCode + " - " + err);
+          response.status(res.statusCode);
           response.end();
         } else {
-          
-        console.log(response.statusCode);   
+        response.status(response.statusCode);
         response.end(JSON.stringify(res.value));
-     
         }
       });
    
