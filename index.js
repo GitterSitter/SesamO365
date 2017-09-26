@@ -144,7 +144,7 @@ function users(response, request) {
           response.status(res.statusCode);
           response.end();
         } else {
-        response.status(response.statusCode);
+        response.status(res.statusCode);
         response.end(JSON.stringify(res.value));
         }
       });
