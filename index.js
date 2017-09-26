@@ -99,7 +99,7 @@ function groups(response, request) {
         response.writeHead(res.statusCode, { "Content-Type": "application/json" }); 
         response.end(res.statusCode);
       } else {
-      console.log(res.statusCode); 
+      console.log("200 OK"); 
       response.writeHead(200, { "Content-Type": "application/json" }); 
       response.end(JSON.stringify(res.value));
       }
@@ -134,7 +134,7 @@ function users(response, request) {
           console.log("Profile Updated");
       });
   } else if(request.method == "GET") {
-    response.writeHead(200, { "Content-Type": "application/json" });   
+  
     client
      .api('https://graph.microsoft.com/beta/users')
    //.api('https://graph.microsoft.com/v1.0/users?$select=*')
@@ -142,7 +142,7 @@ function users(response, request) {
       .get((err, res) => {
         if (err) {
           console.log(err);
-          response.status(res.statusCode);
+          response.writeHead(res.statusCode, { "Content-Type": "application/json" });   
           response.end();
         } else {
           response.end(JSON.stringify(res.value));
