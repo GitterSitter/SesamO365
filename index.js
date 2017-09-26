@@ -92,14 +92,15 @@ function groups(response, request) {
     }
   });
 
-  response.writeHead(200, { "Content-Type": "application/json" }); 
   client.api("https://graph.microsoft.com/beta/groups")
     .get((err, res) => {
       if (err) {
         console.log(err);
+        response.writeHead(res.statusCode, { "Content-Type": "application/json" }); 
         response.end(res.statusCode);
       } else {
       console.log(res.statusCode); 
+      response.writeHead(200, { "Content-Type": "application/json" }); 
       response.end(JSON.stringify(res.value));
       }
     });
@@ -144,8 +145,7 @@ function users(response, request) {
           response.status(res.statusCode);
           response.end();
         } else {
-        response.status(res.statusCode);
-        response.end(JSON.stringify(res.value));
+          response.end(JSON.stringify(res.value));
         }
       });
    
