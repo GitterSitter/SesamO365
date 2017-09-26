@@ -134,11 +134,11 @@ function users(response, request) {
           console.log("Profile Updated");
       });
   } else if(request.method == "GET") {
-  
+  //use netxtLink for the next users after 999
     client
      .api('https://graph.microsoft.com/beta/users')
    //.api('https://graph.microsoft.com/v1.0/users?$select=*')
-   //.top(999)
+     .top(999)
       .get((err, res) => {
         if (err) {
           console.log(err);
