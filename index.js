@@ -62,6 +62,8 @@ function groups(response, request) {
     }
   });
 
+
+  if(request.method == "GET"){
   client
   .api("https://graph.microsoft.com/beta/groups")
   .top(999)
@@ -70,12 +72,19 @@ function groups(response, request) {
         console.log(err);
         response.writeHead(res.statusCode, { "Content-Type": "application/json" }); 
         response.end(res.statusCode);
-      } else {
-      console.log("200 OK"); 
-      response.writeHead(200, { "Content-Type": "application/json" }); 
-      response.end(JSON.stringify(res.value));
+
+      } else if('@odata.nextLink' in res) {
+        getNextPage(result, response, client)
+        console.log("200 OK"); 
+     
+      }else {
+        response.writeHead(200, { "Content-Type": "application/json" }); 
+        response.end(JSON.stringify(res.value));
       }
     });
+
+
+  }
 }
 
 
@@ -108,7 +117,7 @@ function users(response, request) {
   } else if(request.method == "GET") {
 
     client
-     .api('https://graph.microsoft.com/beta/users?$top=999&$filter=accountEnabled eq true')
+     .api('https://graph.microsoft.com/beta/users?$filter=accountEnabled eq true')
      .top(999)
       .get((err, res) => {
         if (err) {
@@ -118,6 +127,7 @@ function users(response, request) {
         } else if('@odata.nextLink' in res) {
           getNextPage(res, response, client);
         }else {
+          response.writeHead(200, { "Content-Type": "application/json" }); 
           response.end(JSON.stringify(res.value));
         }
       });
