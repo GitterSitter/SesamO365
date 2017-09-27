@@ -83,7 +83,6 @@ function groups(response, request) {
         response.end(JSON.stringify(res.value));
       }
     });
-
   }
 }
 
@@ -137,7 +136,6 @@ function users(response, request) {
 
 
 function getNextPage(result, response, client, data){
- 
   var completeResult = data;
  
 if(result['@odata.nextLink']){
@@ -162,6 +160,8 @@ if(result['@odata.nextLink']){
 }
 
 }
+
+
 
 // function getNextPage(result, response, client){
 //   var completeResult = [];
