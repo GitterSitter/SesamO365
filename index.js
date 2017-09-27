@@ -138,6 +138,8 @@ function users(response, request) {
 function getNextPage(result, response, client, data){
 
   var completeResult = data;
+  completeResult = data.concat(result.value);
+
 if(result['@odata.nextLink']){
   client.api(result['@odata.nextLink']) 
    .get((err, res) => {
@@ -148,26 +150,20 @@ if(result['@odata.nextLink']){
        return;
      } else {
    
-      completeResult = data.concat(result.value);
       completeResult.concat(res.value); 
-      
       getNextPage(res, response, client, completeResult)
      }
 });
 
 } else {
-
   console.log("200 OK");
-  console.log("Total num instances: " + completeResult.length); 
-  console.log("Total num instances data: " + data.length); 4
-  console.log("Total num instances data: " + data.concat(result.value).length); 
+  console.log(completeResult.length);
   response.writeHead(200,{"Content-Type": "application/json"});   
-  response.end(JSON.stringify(data.concat(result.value)));
+  response.end(JSON.stringify(completeResult));
   return;
 }
 
 }
-
 
 
 // function getNextPage(result, response, client){
