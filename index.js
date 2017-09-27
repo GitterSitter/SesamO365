@@ -137,20 +137,42 @@ function users(response, request) {
   //use netxtLink for the next users after 999
     client
      .api('https://graph.microsoft.com/beta/users')
-   //.api('https://graph.microsoft.com/v1.0/users?$select=*')
      .top(999)
       .get((err, res) => {
         if (err) {
           console.log(err);
           response.writeHead(res.statusCode, { "Content-Type": "application/json" });   
           response.end();
-        } else {
+        } else if('@odata.nextLink' in res) {
+          getNextPage(res, response, client);
+        }else {
           response.end(JSON.stringify(res.value));
         }
       });
    
   }
 }
+
+
+function getNextPage(result, response, client){
+  console.log(result['@odata.nextLink']);
+  client
+  .api(result['@odata.nextLink'])
+  .top(999)
+   .get((err, res) => {
+     if (err) {
+       console.log(err);
+       response.writeHead(500, { "Content-Type": "application/json" });   
+       response.end();
+     } else {
+      response.end(JSON.stringify(res.value));
+     }
+});
+
+}
+
+
+
 
 // function getCurrentUserSP() {
 //   var ur = 'https://bouvetasa.sharepoint.com/_api/web/currentuser';
