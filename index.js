@@ -157,7 +157,6 @@ if(result['@odata.nextLink']){
 
 } else {
   console.log("200 OK");
-  console.log(completeResult.length);
   response.writeHead(200,{"Content-Type": "application/json"});   
   response.end(JSON.stringify(completeResult));
   return;
