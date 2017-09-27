@@ -113,7 +113,6 @@ function users(response, request) {
           console.log("Profile Updated");
       });
   } else if(request.method == "GET") {
-
     client
      .api('https://graph.microsoft.com/beta/users?$filter=accountEnabled eq true')
      .top(999)
@@ -134,25 +133,50 @@ function users(response, request) {
 
 
 function getNextPage(result, response, client){
- var completeResult = [];
  
-  client
-  .api(result['@odata.nextLink'])
+  var completeResult = [];
+ 
+if(result['@odata.nextLink']){
+  client.api(result['@odata.nextLink']) 
   .top(999)
    .get((err, res) => {
      if (err) {
        console.log(err);
-       response.writeHead(500, {"Content-Type": "application/json"});   
+       response.writeHead(500,{"Content-Type": "application/json"});   
        response.end();
+       return;
      } else {
-      completeResult = result.value.concat(res.value);
-      response.end(JSON.stringify(completeResult));
+      completeResult = result.value.concat(res.value); 
+      getNextPage(completeResult, response, client)
      }
 });
 
+}else {
+  response.writeHead(200,{"Content-Type": "application/json"});   
+  response.end(JSON.stringify(completeResult));
+  return;
 }
 
+}
 
+// function getNextPage(result, response, client){
+//   var completeResult = [];
+  
+//    client
+//    .api(result['@odata.nextLink'])
+//    .top(999)
+//     .get((err, res) => {
+//       if (err) {
+//         console.log(err);
+//         response.writeHead(500, {"Content-Type": "application/json"});   
+//         response.end();
+//       } else {
+//        completeResult = result.value.concat(res.value);
+//        response.end(JSON.stringify(completeResult));
+//       }
+//  });
+
+//  }
 
 // function sharedWithMe() {
 //   var ur = 'https://bouvetasa.sharepoint.com/_api/search/query?querytext=%27(SharedWithUsersOWSUSER:trond.tufte@bouvet.no)%27';
