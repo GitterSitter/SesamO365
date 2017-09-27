@@ -156,6 +156,9 @@ function users(response, request) {
 
 function getNextPage(result, response, client){
   console.log(result['@odata.nextLink']);
+ 
+ var completeResult = [];
+ 
   client
   .api(result['@odata.nextLink'])
   .top(999)
@@ -165,7 +168,8 @@ function getNextPage(result, response, client){
        response.writeHead(500, { "Content-Type": "application/json" });   
        response.end();
      } else {
-      response.end(JSON.stringify(res.value));
+      completeResult = result.value.concat(res.value);
+      response.end(JSON.stringify(completeResult));
      }
 });
 
