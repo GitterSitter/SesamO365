@@ -108,7 +108,7 @@ function users(response, request) {
   } else if(request.method == "GET") {
 
     client
-     .api('https://graph.microsoft.com/beta/users')
+     .api('https://graph.microsoft.com/beta/users?$top=999&$filter=accountEnabled eq true')
      .top(999)
       .get((err, res) => {
         if (err) {
@@ -126,8 +126,6 @@ function users(response, request) {
 
 
 function getNextPage(result, response, client){
-  console.log(result['@odata.nextLink']);
- 
  var completeResult = [];
  
   client
@@ -136,7 +134,7 @@ function getNextPage(result, response, client){
    .get((err, res) => {
      if (err) {
        console.log(err);
-       response.writeHead(500, { "Content-Type": "application/json" });   
+       response.writeHead(500, {"Content-Type": "application/json"});   
        response.end();
      } else {
       completeResult = result.value.concat(res.value);
@@ -173,6 +171,12 @@ function getNextPage(result, response, client){
 
 
 function updateProfilePicture(response, request) {
+  
+  if(request.method == "POST") {
+
+
+ 
+
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       // Just return the token
@@ -210,6 +214,10 @@ function updateProfilePicture(response, request) {
   // 	//reader.readAsDataURL(file);
   // }
 
+
+
+
+}
 }
 
 
