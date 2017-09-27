@@ -146,21 +146,29 @@ if(result['@odata.nextLink']){
        response.writeHead(500,{"Content-Type": "application/json"});   
        response.end();
        return;
-
      } else {
+   
       completeResult = data.concat(result.value);
       completeResult.concat(res.value); 
+      
       getNextPage(res, response, client, completeResult)
      }
 });
 
 } else {
+
   console.log("200 OK");
+  console.log("Total num instances: " + completeResult.length); 
+  console.log("Total num instances data: " + data.length); 4
+  console.log("Total num instances data: " + data.concat(result.value).length); 
   response.writeHead(200,{"Content-Type": "application/json"});   
-  response.end(JSON.stringify(data.concat(result)));
+  response.end(JSON.stringify(data.concat(result.value)));
   return;
 }
+
 }
+
+
 
 // function getNextPage(result, response, client){
 //   var completeResult = [];
