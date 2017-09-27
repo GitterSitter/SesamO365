@@ -73,13 +73,12 @@ function groups(response, request) {
         response.end(res.statusCode);
 
       } else if('@odata.nextLink' in res) {
-     //   getNextPage(res, response, client)
         var data = [];
         getNextPage(res, response, client, data);
-        console.log("200 OK"); 
-     
-      }else {
-        response.writeHead(200, { "Content-Type": "application/json" }); 
+  
+      }else {    
+        console.log("200 OK");  
+        response.writeHead(200, {"Content-Type": "application/json" }); 
         response.end(JSON.stringify(res.value));
       }
     });
@@ -127,6 +126,7 @@ function users(response, request) {
           var data = [];
           getNextPage(res, response, client, data);
         }else {
+          console.log("200 OK"); 
           response.writeHead(200, { "Content-Type": "application/json" }); 
           response.end(JSON.stringify(res.value));
         }
@@ -136,32 +136,31 @@ function users(response, request) {
 
 
 function getNextPage(result, response, client, data){
+
   var completeResult = data;
- 
 if(result['@odata.nextLink']){
   client.api(result['@odata.nextLink']) 
-  .top(999)
    .get((err, res) => {
      if (err) {
        console.log(err);
        response.writeHead(500,{"Content-Type": "application/json"});   
        response.end();
        return;
+
      } else {
-      completeResult = result.value.concat(res.value); 
-      getNextPage(res,response, client, completeResult)
+      completeResult = data.concat(result.value);
+      completeResult.concat(res.value); 
+      getNextPage(res, response, client, completeResult)
      }
 });
 
 } else {
+  console.log("200 OK");
   response.writeHead(200,{"Content-Type": "application/json"});   
-  response.end(JSON.stringify(completeResult));
+  response.end(JSON.stringify(data.concat(result)));
   return;
 }
-
 }
-
-
 
 // function getNextPage(result, response, client){
 //   var completeResult = [];
@@ -210,9 +209,6 @@ function updateProfilePicture(response, request) {
   
   if(request.method == "POST") {
 
-
- 
-
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       // Just return the token
@@ -249,8 +245,6 @@ function updateProfilePicture(response, request) {
   // if (file) {
   // 	//reader.readAsDataURL(file);
   // }
-
-
 
 
 }
