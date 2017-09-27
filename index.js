@@ -62,7 +62,6 @@ function groups(response, request) {
     }
   });
 
-
   if(request.method == "GET"){
   client
   .api("https://graph.microsoft.com/beta/groups")
@@ -70,11 +69,11 @@ function groups(response, request) {
   .get((err, res) => {
       if (err) {
         console.log(err);
-        response.writeHead(res.statusCode, { "Content-Type": "application/json" }); 
+        response.writeHead(res.statusCode, {"Content-Type": "application/json"}); 
         response.end(res.statusCode);
 
       } else if('@odata.nextLink' in res) {
-        getNextPage(result, response, client)
+        getNextPage(res, response, client)
         console.log("200 OK"); 
      
       }else {
@@ -82,7 +81,6 @@ function groups(response, request) {
         response.end(JSON.stringify(res.value));
       }
     });
-
 
   }
 }
