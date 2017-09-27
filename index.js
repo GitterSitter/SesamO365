@@ -73,7 +73,9 @@ function groups(response, request) {
         response.end(res.statusCode);
 
       } else if('@odata.nextLink' in res) {
-        getNextPage(res, response, client)
+     //   getNextPage(res, response, client)
+        var data = [];
+        getNextPage(res, response, client, data);
         console.log("200 OK"); 
      
       }else {
@@ -122,7 +124,9 @@ function users(response, request) {
           response.writeHead(res.statusCode, { "Content-Type": "application/json" });   
           response.end();
         } else if('@odata.nextLink' in res) {
-          getNextPage(res, response, client);
+          // getNextPage(res, response, client);
+          var data = [];
+          getNextPage(res, response, client, data);
         }else {
           response.writeHead(200, { "Content-Type": "application/json" }); 
           response.end(JSON.stringify(res.value));
@@ -132,9 +136,9 @@ function users(response, request) {
 }
 
 
-function getNextPage(result, response, client){
+function getNextPage(result, response, client, data){
  
-  var completeResult = [];
+  var completeResult = data;
  
 if(result['@odata.nextLink']){
   client.api(result['@odata.nextLink']) 
@@ -147,11 +151,11 @@ if(result['@odata.nextLink']){
        return;
      } else {
       completeResult = result.value.concat(res.value); 
-      getNextPage(completeResult, response, client)
+      getNextPage(res,response, client, completeResult)
      }
 });
 
-}else {
+} else {
   response.writeHead(200,{"Content-Type": "application/json"});   
   response.end(JSON.stringify(completeResult));
   return;
