@@ -13,9 +13,6 @@ var qs = require('querystring');
 var csvWriter = require('csv-write-stream')
 
 var handle = {};
-handle['/mail'] = userEmail;
-handle['/calendar'] = calendar;
-handle['/contacts'] = contacts;
 handle['/photo'] = updateProfilePicture;
 handle['/users'] = users;
 handle['/groups'] = groups;
@@ -43,7 +40,6 @@ auth.getAccessToken().then(function (token) {
 
 
 
-
 function getNewToken(){
   auth.getAccessToken().then(function (token) {
       saveToken(token)
@@ -57,32 +53,6 @@ function getNewToken(){
 }
 
 
-
-
-
-
-
-
-function userEmail(userId) {
-  userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-  var client = microsoftGraph.Client.init({
-    authProvider: (done) => {
-      done(null, token);
-    }
-  });
-  client
-    .api('/users/' + userId + '/mail')
-    .get((err, res) => {
-      if (err) {
-        console.log(err);
-      } else {
-
-        console.log(res.value);
-      }
-    });
-}
-
-
 function groups(response, request) {
   getNewToken();
  
@@ -92,8 +62,10 @@ function groups(response, request) {
     }
   });
 
-  client.api("https://graph.microsoft.com/beta/groups")
-    .get((err, res) => {
+  client
+  .api("https://graph.microsoft.com/beta/groups")
+  .top(999)
+  .get((err, res) => {
       if (err) {
         console.log(err);
         response.writeHead(res.statusCode, { "Content-Type": "application/json" }); 
@@ -134,7 +106,7 @@ function users(response, request) {
           console.log("Profile Updated");
       });
   } else if(request.method == "GET") {
-  //use netxtLink for the next users after 999
+
     client
      .api('https://graph.microsoft.com/beta/users')
      .top(999)
@@ -149,7 +121,6 @@ function users(response, request) {
           response.end(JSON.stringify(res.value));
         }
       });
-   
   }
 }
 
@@ -177,30 +148,6 @@ function getNextPage(result, response, client){
 
 
 
-
-// function getCurrentUserSP() {
-//   var ur = 'https://bouvetasa.sharepoint.com/_api/web/currentuser';
-//   var opt = {
-//     url: ur,
-//       method: "GET",
-//     header: {
-//       'User-Agent': 'Super Agent/0.0.1',
-//       'Content-Type': 'application/x-www-form-urlencoded',
-
-//     }
-//   }
-//   request(opt, function (error, response, body) {
-//     if (!error && response.statusCode == 200) {
-//       console.log(error);
-//       return error;
-//     } else {
-//       //response.statusCode +s
-//       console.log( " " + response.value + body);
-//       return response;
-//     }
-//   });
-// }
-
 // function sharedWithMe() {
 //   var ur = 'https://bouvetasa.sharepoint.com/_api/search/query?querytext=%27(SharedWithUsersOWSUSER:trond.tufte@bouvet.no)%27';
 //   var opt = {
@@ -223,43 +170,6 @@ function getNextPage(result, response, client){
 //   });
 // }
 
-function calendar(userId) {
-  userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-  var client = microsoftGraph.Client.init({
-    authProvider: (done) => {
-      done(null, token);
-    }
-  });
-  client
-    .api('/users/' + userId + '/events')
-    .get((err, res) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(res.value);
-      }
-
-    });
-}
-
-function contacts(userId) {
-  userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-  var client = microsoftGraph.Client.init({
-    authProvider: (done) => {
-      done(null, token);
-    }
-  });
-  client
-    .api('/users/' + userId + '/contacts')
-    .get((err, res) => {
-      if (err) {
-        console.log(err);
-      } else {
-        console.log(res.value);
-      }
-
-    });
-}
 
 
 function updateProfilePicture(response, request) {
@@ -269,7 +179,6 @@ function updateProfilePicture(response, request) {
       done(null, token);
     }
   });
-
 
 
  //var userId = "50e2882f-56d1-4d62-892a-e62d999fce7f"; //"30be01d3-8214-4f2d-aea0-7028a19581fc";  //(britt)    "8fa20769-13f0-4b67-b777-c262b174d93e"; (Eirik?)  //e97f274a-2a86-4280-997d-8ee4d2c52078  (min)
@@ -302,6 +211,30 @@ function updateProfilePicture(response, request) {
   // }
 
 }
+
+
+
+
+  // var array = fs.readFileSync('./out.csv').toString().split("\n");
+  // for(i in array) {
+  //     console.log(array[i]);
+  // }
+
+  // fs.readFile('./out.csv', function read(err, data) { 
+  //   if (err) {
+  //         throw err;
+  //     }
+  //     content = data;
+  //     // console.log(content);
+  //     processFile(content);         
+  // });
+
+
+
+// function processFile(content) {
+//     console.log(content);
+// }
+
 
 // function photoDownload(response, request, userId) {
 
@@ -411,27 +344,3 @@ function shareFile(response, request) {
     });
   }
 }
-
-
-
-
-
-  // var array = fs.readFileSync('./out.csv').toString().split("\n");
-  // for(i in array) {
-  //     console.log(array[i]);
-  // }
-
-  // fs.readFile('./out.csv', function read(err, data) { 
-  //   if (err) {
-  //         throw err;
-  //     }
-  //     content = data;
-  //     // console.log(content);
-  //     processFile(content);         
-  // });
-
-
-
-// function processFile(content) {
-//     console.log(content);
-// }
