@@ -2,6 +2,7 @@
 var server = require('./server');
 var router = require('./router');
 var request = require("request");
+var reqUrl = require('request').defaults({ encoding: null });
 
 var microsoftGraph = require("@microsoft/microsoft-graph-client");
 var fs = require('fs');
@@ -69,8 +70,8 @@ function groups(response, request) {
   .get((err, res) => {
       if (err) {
         console.log(err);
-        response.writeHead(res.statusCode, {"Content-Type": "application/json"}); 
-        response.end(res.statusCode);
+        response.writeHead(500, {"Content-Type": "application/json"}); 
+        response.end(res.statusCode + " - " + err);
 
       } else if('@odata.nextLink' in res) {
         var data = [];
@@ -119,7 +120,7 @@ function users(response, request) {
       .get((err, res) => {
         if (err) {
           console.log(err);
-          response.writeHead(res.statusCode, { "Content-Type": "application/json" });   
+          response.writeHead(500, { "Content-Type": "application/json" });   
           response.end();
         } else if('@odata.nextLink' in res) {
           // getNextPage(res, response, client);
@@ -209,30 +210,83 @@ if(result['@odata.nextLink']){
 
 
 function updateProfilePicture(response, request) {
-  
-  if(request.method == "POST") {
 
-  var client = microsoftGraph.Client.init({
+  if(request.method == "POST") {
+    var body = "";
+
+    var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       // Just return the token
       done(null, token);
     }
   });
 
+  request.on('data', function (input) {
+    body += input;
 
- //var userId = "50e2882f-56d1-4d62-892a-e62d999fce7f"; //"30be01d3-8214-4f2d-aea0-7028a19581fc";  //(britt)    "8fa20769-13f0-4b67-b777-c262b174d93e"; (Eirik?)  //e97f274a-2a86-4280-997d-8ee4d2c52078  (min)
-  var file = fs.readFileSync('./logo.png'); // fs.openSync("logo.png","r"); //new File("logo.png");       
-  //var reader = new FileReader();
-  client
-    .api("/users/" + userId + "/photo/$value")
-    .put(file, (err, res) => {
+    if (body.length > 1e6) {
+      request.connection.destroy();
+    }
+
+
+ //userId: "50e2882f-56d1-4d62-892a-e62d999fce7f"; //"30be01d3-8214-4f2d-aea0-7028a19581fc";  //(britt)  
+ 
+ var data = JSON.parse(body);
+ var userArray = data["data"];
+
+ userArray.forEach(function (element) {
+
+  var userId = element["id"];
+  var image = element["image"];
+
+  // console.log(userId);
+  // console.log(image);
+
+  download(image, userId + '.png', function(){
+  var img = fs.readFileSync(userId + '.png');
+
+    console.log("Image downloaded!");
+
+    client.api("/users/" + userId + "/photo/$value")
+    .put(img, (err, res) => {
       if (err) {
         console.log(err);
-        return;
       }
+
       response.end("Image updated!");
       console.log("Image updated!");
+   
+      // fs.unlink( "./" + userId + '.png', function(err) {
+      //   if(err){
+      //     console.log("Cant remove file!");
+      //   }
+      //       console.log(userId + '.png' + " deleted");
+      // });
+
+      });
+
     });
+
+      });
+
+  });
+  //reqUrl.get(image, function (err, res, file) {
+ //  });
+}
+  
+}
+
+
+var download = function(uri, filename, callback){
+  request.head(uri, function(err, res, body){
+    console.log('content-type:', res.headers['content-type']);
+    console.log('content-length:', res.headers['content-length']);
+
+    request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
+  });
+};
+
+
 
   // reader.addEventListener("load", function () {
   // 	client
@@ -249,9 +303,6 @@ function updateProfilePicture(response, request) {
   // 	//reader.readAsDataURL(file);
   // }
 
-
-}
-}
 
 
 
@@ -313,6 +364,8 @@ function shareFile(response, request) {
   if (request.method == "POST") {
     var data = "";
     var body = "";
+
+
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
         done(null, token);
