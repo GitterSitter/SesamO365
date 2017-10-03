@@ -235,25 +235,26 @@ data.forEach(function (element) {
 
 console.log(element);
 
-  var userId = element["test-o365-image:id"];
-  var test = element["test-o365-image:image"];
-  var image = test["cvpartner-user:fit_thumb"]["cvpartner-user:url"];
+  var userId = element["id"];
+  var test = element["image"];
+  var image = test["fit_thumb"]["url"];
+
+  // var userId = element["test-o365-image:id"];
+  // var test = element["test-o365-image:image"];
+  // var image = test["cvpartner-user:fit_thumb"]["cvpartner-user:url"];
   
 
-  console.log("ID: " + userId);
-  console.log("Image: " + image);
-
+  //console.log("ID: " + userId);
+  //console.log("Image: " + image);
 
 if(image === "" || image === null){
   image = "https://cdn.pixabay.com/photo/2016/10/27/22/53/heart-1776746_1280.jpg";
 }
 
-
   if(image != null || image != ""){
+
   console.log("ArraySize: " + data.length);
-
   download(image, userId + '.png', function(){
-
   var img = fs.readFile(userId + '.png',function(err, data){
   if(err){
     console.log(+"Error downloading file: " + err);
