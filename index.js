@@ -210,7 +210,6 @@ if(result['@odata.nextLink']){
 
 
 function updateProfilePicture(response, request) {
-
   if(request.method == "POST") {
     var body = "";
 
@@ -228,43 +227,46 @@ function updateProfilePicture(response, request) {
     }
 
 
- var data = JSON.parse(body);
-//  var userArray = data["data"];
-var image = "";
-var test ="";
-
+var data = JSON.parse(body);
 data.forEach(function (element) {
-console.log(element);
+  var image = "";
+  var test = "";
 
 var userId = element["id"];
+var userName = element["name"];
 
   if(element["image"] != null ){
-   test = element["image"];
-
+     test = element["image"];
         if(test["fit_thumb"]["url"] != null){
           image = test["fit_thumb"]["url"];
         }
 
   }
+  console.log(element);
+  // console.log(userName);
+  // console.log(userId);
+  // console.log(image);
 
- 
-  // var userId = element["test-o365-image:id"];
-  // var test = element["test-o365-image:image"];
-  // var image = test["cvpartner-user:fit_thumb"]["cvpartner-user:url"];
-  
+if(image == null || image == ""){
+ // image = "https://cdn.pixabay.com/photo/2016/10/27/22/53/heart-1776746_1280.jpg";
+    fs.readFile('./leaf.png',function(err,img){
+    
+    if(!err){
+        client.api("/users/" + userId + "/photo/$value")
+        .put(img, (err, res) => {
+          if (err) {
+            console.log("Error setting profile image!" );
+          }else {
+            response.end("Image updated to default");
+            console.log("Image updated to default");
+        
+          }
+  });
 
-  //console.log("ID: " + userId);
-  //console.log("Image: " + image);
-
-console.log(image);
-console.log("ArraySize: " + data.length);
-if(image === null || image === ""){
-  image = "https://cdn.pixabay.com/photo/2016/10/27/22/53/heart-1776746_1280.jpg";
 }
+});
 
-
-console.log(image);
- 
+} else {
   download(image, userId + '.png', function(){
   var img = fs.readFile(userId + '.png',function(err, data){
   if(err){
@@ -275,7 +277,7 @@ console.log("Image downloaded!");
 client.api("/users/" + userId + "/photo/$value")
 .put(data, (err, res) => {
   if (err) {
-    console.log(""+ err + "Error setting profile image!" );
+    console.log("Error setting profile image!" );
   }else {
     response.end("Image updated!");
     console.log("Image updated!");
@@ -283,6 +285,7 @@ client.api("/users/" + userId + "/photo/$value")
   }
 
   });
+
       // fs.unlink( "./" + userId + '.png', function(err) {
       //   if(err){
       //     console.log("Cant remove file!");
@@ -294,12 +297,11 @@ client.api("/users/" + userId + "/photo/$value")
       });
     });
 
-  
+  }
 
     });
 
   });
-
 
 }
 
