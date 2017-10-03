@@ -238,7 +238,7 @@ console.log(element);
   var userId = element["id"];
   var test = element["image"];
 
-  if(test != null || test != ""){
+  if(test != null || test != "" || test === "null"){
     var image = test["fit_thumb"]["url"];
   }
 
