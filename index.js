@@ -230,19 +230,21 @@ function updateProfilePicture(response, request) {
 
  var data = JSON.parse(body);
 //  var userArray = data["data"];
+var image = "";
+var test ="";
 
 data.forEach(function (element) {
 console.log(element);
+
 var userId = element["id"];
 
-
   if(element["image"] != null ){
-  var test = element["image"];
-  }
+   test = element["image"];
 
+        if(test["fit_thumb"]["url"] != null){
+          image = test["fit_thumb"]["url"];
+        }
 
-  if(test != null && test != "null"){
-    var image = test["fit_thumb"]["url"];
   }
 
  
@@ -254,11 +256,15 @@ var userId = element["id"];
   //console.log("ID: " + userId);
   //console.log("Image: " + image);
 
-if(image === "" || image === null){
+console.log(image);
+console.log("ArraySize: " + data.length);
+if(image === null || image === ""){
   image = "https://cdn.pixabay.com/photo/2016/10/27/22/53/heart-1776746_1280.jpg";
-}else {
+}
 
-  console.log("ArraySize: " + data.length);
+
+console.log(image);
+ 
   download(image, userId + '.png', function(){
   var img = fs.readFile(userId + '.png',function(err, data){
   if(err){
@@ -288,7 +294,7 @@ client.api("/users/" + userId + "/photo/$value")
       });
     });
 
-  }
+  
 
     });
 
@@ -300,8 +306,6 @@ client.api("/users/" + userId + "/photo/$value")
 }
 
   
-
-
 var download = function(uri, filename, callback){
   request.head(uri, function(err, res, body){
     // console.log('content-type:', res.headers['content-type']);
