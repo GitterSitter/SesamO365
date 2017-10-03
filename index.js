@@ -238,9 +238,9 @@ data.forEach(function (element) {
 
   console.log("Instance: " + element);
   console.log("ArraySize: " + data.length);
-  
+
   download(image, userId + '.png', function(){
-  var img = fs.readFileSync(userId + '.png',function(err, data){
+  var img = fs.readFile(userId + '.png',function(err, data){
 
   if(err){
     console.log(err);
