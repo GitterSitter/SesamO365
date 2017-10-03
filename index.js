@@ -216,7 +216,6 @@ function updateProfilePicture(response, request) {
 
     var client = microsoftGraph.Client.init({
     authProvider: (done) => {
-      // Just return the token
       done(null, token);
     }
   });
@@ -229,24 +228,18 @@ function updateProfilePicture(response, request) {
     }
 
 
- //userId: "50e2882f-56d1-4d62-892a-e62d999fce7f"; //"30be01d3-8214-4f2d-aea0-7028a19581fc";  //(britt)  
- 
  var data = JSON.parse(body);
- var userArray = data["data"];
+//  var userArray = data["data"];
 
- userArray.forEach(function (element) {
+data.forEach(function (element) {
 
   var userId = element["id"];
   var image = element["image"];
-
-  // console.log(userId);
-  // console.log(image);
 
   download(image, userId + '.png', function(){
   var img = fs.readFileSync(userId + '.png');
 
     console.log("Image downloaded!");
-
     client.api("/users/" + userId + "/photo/$value")
     .put(img, (err, res) => {
       if (err) {
@@ -270,8 +263,6 @@ function updateProfilePicture(response, request) {
       });
 
   });
-  //reqUrl.get(image, function (err, res, file) {
- //  });
 }
   
 }
@@ -304,28 +295,6 @@ var download = function(uri, filename, callback){
   // }
 
 
-
-
-
-  // var array = fs.readFileSync('./out.csv').toString().split("\n");
-  // for(i in array) {
-  //     console.log(array[i]);
-  // }
-
-  // fs.readFile('./out.csv', function read(err, data) { 
-  //   if (err) {
-  //         throw err;
-  //     }
-  //     content = data;
-  //     // console.log(content);
-  //     processFile(content);         
-  // });
-
-
-
-// function processFile(content) {
-//     console.log(content);
-// }
 
 
 // function photoDownload(response, request, userId) {
