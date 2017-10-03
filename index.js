@@ -232,20 +232,20 @@ function updateProfilePicture(response, request) {
 //  var userArray = data["data"];
 
 data.forEach(function (element) {
-
 console.log(element);
+var userId = element["id"];
 
-  var userId = element["id"];
 
   if(element["image"] != null ){
-
   var test = element["image"];
-
-  if(test != null || test != "null"){
-    var image = test["fit_thumb"]["url"];
   }
 
 
+  if(test != null && test != "null"){
+    var image = test["fit_thumb"]["url"];
+  }
+
+ 
   // var userId = element["test-o365-image:id"];
   // var test = element["test-o365-image:image"];
   // var image = test["cvpartner-user:fit_thumb"]["cvpartner-user:url"];
@@ -256,9 +256,7 @@ console.log(element);
 
 if(image === "" || image === null){
   image = "https://cdn.pixabay.com/photo/2016/10/27/22/53/heart-1776746_1280.jpg";
-}
-
-  if(image != null || image != ""){
+}else {
 
   console.log("ArraySize: " + data.length);
   download(image, userId + '.png', function(){
@@ -285,14 +283,23 @@ client.api("/users/" + userId + "/photo/$value")
       //   }
       //       console.log(userId + '.png' + " deleted");
       // });
+
+   
       });
     });
+
   }
-      });
+
+    });
+
   });
 
+
 }
+
 }
+
+  
 
 
 var download = function(uri, filename, callback){
