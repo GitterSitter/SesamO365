@@ -236,9 +236,16 @@ data.forEach(function (element) {
   var userId = element["id"];
   var image = element["image"];
 
+  console.log("Image: " + image);
+
+if(image === "" || image === null){
+
+  image = "https://cdn.pixabay.com/photo/2016/10/27/22/53/heart-1776746_1280.jpg";
+}
+
+
   if(image != null || image != ""){
    
-
   console.log(element);
   console.log("ArraySize: " + data.length);
 
@@ -260,8 +267,6 @@ client.api("/users/" + userId + "/photo/$value")
 
   }
 
-  
-
   });
       // fs.unlink( "./" + userId + '.png', function(err) {
       //   if(err){
@@ -269,30 +274,13 @@ client.api("/users/" + userId + "/photo/$value")
       //   }
       //       console.log(userId + '.png' + " deleted");
       // });
-
       });
-
     });
-
-
   }
       });
-
-
-  
-
-    
   });
 
-
-
-
-
-
-
-
 }
-  
 }
 
 
