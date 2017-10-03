@@ -236,6 +236,9 @@ data.forEach(function (element) {
   var userId = element["id"];
   var image = element["image"];
 
+  if(image != null || image != ""){
+   
+
   console.log(element);
   console.log("ArraySize: " + data.length);
 
@@ -250,7 +253,7 @@ console.log("Image downloaded!");
 client.api("/users/" + userId + "/photo/$value")
 .put(data, (err, res) => {
   if (err) {
-    console.log(err + "Error setting profile image!" );
+    console.log(""+ err + "Error setting profile image!" );
   }else {
     response.end("Image updated!");
     console.log("Image updated!");
@@ -271,9 +274,23 @@ client.api("/users/" + userId + "/photo/$value")
 
     });
 
+
+  }
       });
 
+
+  
+
+    
   });
+
+
+
+
+
+
+
+
 }
   
 }
