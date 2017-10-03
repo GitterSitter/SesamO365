@@ -226,44 +226,43 @@ function updateProfilePicture(response, request) {
       request.connection.destroy();
     }
 
+ 
+    var data = JSON.parse(body);
 
-var data = JSON.parse(body);
 data.forEach(function (element) {
   var image = "";
   var test = "";
 
-var userId = element["id"];
-var userName = element["name"];
+ var userId = element["id"];
+ var userName = element["name"];
 
   if(element["image"] != null ){
-     test = element["image"];
+
+        test = element["image"];
         if(test["fit_thumb"]["url"] != null){
           image = test["fit_thumb"]["url"];
         }
 
   }
-  console.log(element);
-  // console.log(userName);
-  // console.log(userId);
-  // console.log(image);
+ // console.log(element);
+ console.log(userName);
+ console.log(image);
 
-if(image == null || image == ""){
- // image = "https://cdn.pixabay.com/photo/2016/10/27/22/53/heart-1776746_1280.jpg";
+if(image === null || image === ""){
     fs.readFile('./leaf.png',function(err,img){
-    
     if(!err){
         client.api("/users/" + userId + "/photo/$value")
         .put(img, (err, res) => {
           if (err) {
             console.log("Error setting profile image!" );
           }else {
-            response.end("Image updated to default");
-            console.log("Image updated to default");
+            response.end("image updated to default");
+            console.log( userName + "s image updated to default");
         
           }
   });
-
 }
+
 });
 
 } else {
@@ -277,10 +276,10 @@ console.log("Image downloaded!");
 client.api("/users/" + userId + "/photo/$value")
 .put(data, (err, res) => {
   if (err) {
-    console.log("Error setting profile image!" );
+    console.log("Error setting downloaded profile image" );
   }else {
-    response.end("Image updated!");
-    console.log("Image updated!");
+    response.end("image updated!");
+    console.log( userName +"s image updated!");
 
   }
 
@@ -293,8 +292,9 @@ client.api("/users/" + userId + "/photo/$value")
       //       console.log(userId + '.png' + " deleted");
       // });
 
-   
       });
+
+
     });
 
   }
