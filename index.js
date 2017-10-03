@@ -236,9 +236,12 @@ data.forEach(function (element) {
 console.log(element);
 
   var userId = element["id"];
+
+  if(element["image"] != null ){
+
   var test = element["image"];
 
-  if(test != null || test != "" || test === "null"){
+  if(test != null || test != "null"){
     var image = test["fit_thumb"]["url"];
   }
 
