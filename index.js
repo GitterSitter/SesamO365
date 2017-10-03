@@ -237,7 +237,11 @@ console.log(element);
 
   var userId = element["id"];
   var test = element["image"];
-  var image = test["fit_thumb"]["url"];
+
+  if(test != null || test != ""){
+    var image = test["fit_thumb"]["url"];
+  }
+
 
   // var userId = element["test-o365-image:id"];
   // var test = element["test-o365-image:image"];
