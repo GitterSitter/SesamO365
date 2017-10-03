@@ -236,25 +236,28 @@ data.forEach(function (element) {
   var userId = element["id"];
   var image = element["image"];
 
-  console.log("Instance: " + element);
+  console.log(element);
   console.log("ArraySize: " + data.length);
 
   download(image, userId + '.png', function(){
-  var img = fs.readFile(userId + '.png',function(err, data){
 
+  var img = fs.readFile(userId + '.png',function(err, data){
   if(err){
-    console.log(err);
+    console.log(+"Error downloading file: " + err);
   }
 
 console.log("Image downloaded!");
 client.api("/users/" + userId + "/photo/$value")
 .put(data, (err, res) => {
   if (err) {
-    console.log(err);
+    console.log(err + "Error setting profile image!" );
+  }else {
+    response.end("Image updated!");
+    console.log("Image updated!");
+
   }
 
-  response.end("Image updated!");
-  console.log("Image updated!");
+  
 
   });
       // fs.unlink( "./" + userId + '.png', function(err) {
