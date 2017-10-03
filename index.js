@@ -236,19 +236,27 @@ data.forEach(function (element) {
   var userId = element["id"];
   var image = element["image"];
 
+  console.log("Instance: " + element);
+  console.log("ArraySize: " + data.length);
+  
   download(image, userId + '.png', function(){
-  var img = fs.readFileSync(userId + '.png');
+  var img = fs.readFileSync(userId + '.png',function(err, data){
 
-    console.log("Image downloaded!");
-    client.api("/users/" + userId + "/photo/$value")
-    .put(img, (err, res) => {
-      if (err) {
-        console.log(err);
-      }
+  if(err){
+    console.log(err);
+  }
 
-      response.end("Image updated!");
-      console.log("Image updated!");
-   
+console.log("Image downloaded!");
+client.api("/users/" + userId + "/photo/$value")
+.put(data, (err, res) => {
+  if (err) {
+    console.log(err);
+  }
+
+  response.end("Image updated!");
+  console.log("Image updated!");
+
+  });
       // fs.unlink( "./" + userId + '.png', function(err) {
       //   if(err){
       //     console.log("Cant remove file!");
