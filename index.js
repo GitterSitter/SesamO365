@@ -213,6 +213,7 @@ function updateProfilePicture(response, request) {
           // }
 
           // });
+        response.end("image updated to default");
         console.log(userName + " is skipped because of no picture");
         } else {
           download(image, userId + '.png', function () {
