@@ -78,9 +78,8 @@ function userStatus(response, request) {
         var counter = 0;
 
       if(userArray.length === 0){
-        response.writeHead(400, { "Content-Type": "application/json" });
+        response.writeHead(200, { "Content-Type": "application/json" });
         response.end("No data");
-
         return;
       }
         
