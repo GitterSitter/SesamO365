@@ -88,14 +88,12 @@ function userStatus(response, request) {
                 
                 } else {
                   console.log("200 OK");
-                  console.log(res); 
                   console.log("Instances: " + userMail.length);      
                   userMail.push(res);
                 } 
 
                   if(userArray.length === userMail.length){
-                    console.log("******************** FNISHED *********************");
-                    
+                    console.log("******************** FNISHED *********************");        
                     response.writeHead(200, { "Content-Type": "application/json" });
                     response.end(JSON.stringify(userMail));
                                   
