@@ -75,26 +75,27 @@ function userStatus(response, request) {
            
         var userMail = [];
         var userArray = JSON.parse(body);
-        var limit = userArray.length;
+        var counter = 0;
         console.log("request batch size: " + userArray.length);
         userArray.forEach(function (element) {    
              var id = element["id"];
              var name = element["displayName"];
-             
-        if(name != ""){
+
+  
            // var id = element["o365-user:id"];
             client.api("https://graph.microsoft.com/beta/users/"+ id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
               .get((err, res) => {
                 if (err) {
                   console.log(name +" has got no mail account!");
-                
+                  ++counter;
                 } else {
                   console.log("200 OK");
                   console.log("Instances: " + userMail.length);      
                   userMail.push(res);
+                  ++counter;
                 } 
 
-                  if(userMail.length === limit){
+                  if(counter === userArray.length){
                     console.log("******************** FNISHED *********************");        
                     response.writeHead(200, { "Content-Type": "application/json" });
                     response.end(JSON.stringify(userMail));
@@ -103,8 +104,7 @@ function userStatus(response, request) {
                 
               });
 
-            }
-
+          
 
             });
 
