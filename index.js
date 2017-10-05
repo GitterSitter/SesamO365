@@ -119,17 +119,16 @@ function userStatus(response, request) {
   } else if (request.method == "GET") {
     if (userStatusArray.length != 0) {
 
-      var batchResponse = [];
-      var test = userStatusArray;
-
-      userStatusArray.forEach(function (element) {
+       var batchResponse = [];
+      
+        userStatusArray.forEach(function (element) {
         batchResponse.push(element);
-        test.splice(element, 1);
+        userStatusArray.splice(element, 1);
 
-        if (test.length < 100) {
+        if (userStatusArray.length < 100) {
           console.log("Reached last elements: counter=" + test + " array=" + batchResponse.length);
           response.writeHead(200, { "Content-Type": "application/json" });
-          response.end(JSON.stringify(test));
+          response.end(JSON.stringify(userStatusArray));
           return null;
         }
 
@@ -140,12 +139,11 @@ function userStatus(response, request) {
           batchResponse = [];
         }
 
-
       });
 
     } else {
       console.log(500);
-      response.writeHead(500, { "Content-Type": "application/json" });
+      response.writeHead(200, { "Content-Type": "application/json" });
       response.end("No data");
     }
   }
