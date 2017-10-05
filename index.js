@@ -92,7 +92,7 @@ function userStatus(response, request) {
                   userMail.push(res);
                 } 
 
-                  if(userArray.length === userMail.length){
+                  if(userArray.length === 99){
                     console.log("******************** FNISHED *********************");        
                     response.writeHead(200, { "Content-Type": "application/json" });
                     response.end(JSON.stringify(userMail));
