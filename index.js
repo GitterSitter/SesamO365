@@ -11,7 +11,7 @@ var auth = require('./auth');
 var request = require('request');
 var qs = require('querystring');
 var csvWriter = require('csv-write-stream')
-var userMail = [];
+
 
 
 var handle = {};
@@ -73,7 +73,7 @@ function userStatus(response, request) {
           request.connection.destroy();
         }
            
-         
+        var userMail = [];
         var userArray = JSON.parse(body);
         console.log("Size of the total users from pipe: " + userArray.length);
         userArray.forEach(function (element) {    
@@ -92,7 +92,7 @@ function userStatus(response, request) {
                   userMail.push(res);
                 } 
 
-                  if(userArray.length === 100){
+                  if(userMail.length === 100){
                     console.log("******************** FNISHED *********************");        
                     response.writeHead(200, { "Content-Type": "application/json" });
                     response.end(JSON.stringify(userMail));
