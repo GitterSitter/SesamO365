@@ -118,9 +118,21 @@ function userStatus(response, request) {
 
     } else if(request.method == "GET"){
       if(userStatusArray.length != 0){
+
           var batchResponse = [];
+          var test = userStatusArray.length;
+
           userStatusArray.forEach(function(element){
           batchResponse.push(element);
+          --test;
+              
+                if(test <= 100){
+                  console.log("Reached last elements: counter=" + test + " array="+batchResponse.length);
+                  response.writeHead(200, {"Content-Type": "application/json" });
+                  //  response.write(JSON.stringify(batchResponse));
+                  response.end(JSON.stringify(batchResponse));
+                    return;
+                }
 
           if(batchResponse.length == 100){
             console.log(200);
