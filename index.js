@@ -12,6 +12,7 @@ var request = require('request');
 var qs = require('querystring');
 var csvWriter = require('csv-write-stream')
 
+var userStatus = [];
 
 
 var handle = {};
@@ -56,6 +57,8 @@ function getNewToken() {
 }
 
 
+
+//Trenger kanskje en refaktorisering... Takle mange request!
 function userStatus(response, request) {
   getNewToken();
   
@@ -88,8 +91,6 @@ function userStatus(response, request) {
              var id = element["id"];
              var name = element["displayName"];
 
-  
-           // var id = element["o365-user:id"];
             client.api("https://graph.microsoft.com/beta/users/"+ id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
               .get((err, res) => {
                 if (err) {
@@ -97,6 +98,7 @@ function userStatus(response, request) {
                   ++counter;
                 } else { 
                   userMail.push(res);
+                  userStatus.push(res);
                   ++counter;
                 } 
                   if(counter === userArray.length){
@@ -109,15 +111,20 @@ function userStatus(response, request) {
                 
               });
 
-          
-
             });
-
-         
       });
+    }else if(request.method == "GET"){
+
+      if(userStatus.length != 0){
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify(userStatus));
+      }else {
+        response.writeHead(500, { "Content-Type": "application/json" });
+        response.end("No data");
+      }
+  
     }
 }
-
 
 
 
@@ -162,7 +169,6 @@ function users(response, request) {
       done(null, token);
     }
   });
-
 
   if (request.method == "POST") {
     //tlf nr funker! /mobilePhone
@@ -249,7 +255,6 @@ function updateProfilePicture(response, request) {
         request.connection.destroy();
       }
 
-
       var data = JSON.parse(body);
 
       data.forEach(function (element) {
@@ -328,9 +333,6 @@ var download = function (uri, filename, callback) {
     request(uri).pipe(fs.createWriteStream(filename)).on('close', callback);
   });
 };
-
-
-
 
 
 // function photoDownload(response, request, userId) {
