@@ -105,7 +105,8 @@ function userStatus(response, request) {
                     console.log("Instances: " + userMail.length);
                     console.log("200 OK");             
                     response.writeHead(200, { "Content-Type": "application/json" });
-                    response.end(JSON.stringify(userMail));
+                  //  response.end(JSON.stringify(userMail));
+                    response.end("200");
                                   
                   }
                 
@@ -117,13 +118,14 @@ function userStatus(response, request) {
 
     } else if(request.method == "GET"){
       if(userStatusArray.length != 0){
+        console.log(200);
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify(userStatusArray));
       }else {
+        console.log(500);
         response.writeHead(500, { "Content-Type": "application/json" });
         response.end("No data");
       }
-  
     }
 }
 
