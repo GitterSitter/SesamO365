@@ -60,95 +60,95 @@ function getNewToken() {
 
 function userStatus(response, request) {
   getNewToken();
-  
-    var client = microsoftGraph.Client.init({
-      authProvider: (done) => {
-        done(null, token);
+
+  var client = microsoftGraph.Client.init({
+    authProvider: (done) => {
+      done(null, token);
+    }
+  });
+
+
+  if (request.method == "POST") {
+    var body = [];
+    request.on('data', function (input) {
+      body += input;
+      if (body.length > 1e6) {
+        request.connection.destroy();
       }
-    });
 
-    
-    if (request.method == "POST") {
-      var body = [];
-      request.on('data', function (input) {
-        body += input;
-        if (body.length > 1e6) {
-          request.connection.destroy();
-        }
-           
-        var userMail = [];
-        var userArray = JSON.parse(body);
-        var counter = 0;
+      var userMail = [];
+      var userArray = JSON.parse(body);
+      var counter = 0;
 
-      if(userArray.length === 0){
+      if (userArray.length === 0) {
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end("No data");
         return;
       }
-        
-        console.log("request batch size: " + userArray.length);
-        userArray.forEach(function (element) {    
-             var id = element["id"];
-             var name = element["displayName"];
 
-            client.api("https://graph.microsoft.com/beta/users/"+ id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
-              .get((err, res) => {
-                if (err) {
-                  console.log(name +" has got no mail account!");
-                  ++counter;
-                } else { 
-                  userMail.push(res);
-                  userStatusArray.push(res);
-                  ++counter;
-                } 
-                  if(counter === userArray.length){
-                    console.log("Instances: " + userMail.length);
-                    console.log("200 OK");             
-                    response.writeHead(200, { "Content-Type": "application/json" });
-                  //  response.end(JSON.stringify(userMail));
-                    response.end("200");
-                                  
-                  }
-                
-              });
+      console.log("request batch size: " + userArray.length);
+      userArray.forEach(function (element) {
+        var id = element["id"];
+        var name = element["displayName"];
 
-            });
+        client.api("https://graph.microsoft.com/beta/users/" + id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
+          .get((err, res) => {
+            if (err) {
+              console.log(name + " has got no mail account!");
+              ++counter;
+            } else {
+              userMail.push(res);
+              userStatusArray.push(res);
+              ++counter;
+            }
+            if (counter === userArray.length) {
+              console.log("Instances: " + userMail.length);
+              console.log("200 OK");
+              response.writeHead(200, { "Content-Type": "application/json" });
+              //  response.end(JSON.stringify(userMail));
+              response.end("200");
+
+            }
+
+          });
+
+      });
+    });
+
+
+  } else if (request.method == "GET") {
+    if (userStatusArray.length != 0) {
+
+      var batchResponse = [];
+      var test = userStatusArray;
+
+      userStatusArray.forEach(function (element) {
+        batchResponse.push(element);
+        test.splice(element, 1);
+
+        if (test.length < 100) {
+          console.log("Reached last elements: counter=" + test + " array=" + batchResponse.length);
+          response.writeHead(200, { "Content-Type": "application/json" });
+          response.end(JSON.stringify(test));
+          return null;
+        }
+
+        if (batchResponse.length == 100) {
+          console.log(200);
+          response.writeHead(200, { "Content-Type": "application/json" });
+          response.end(JSON.stringify(batchResponse));
+          batchResponse = [];
+        }
+
+
       });
 
-
-    } else if(request.method == "GET"){
-      if(userStatusArray.length != 0){
-
-          var batchResponse = [];
-          var test = userStatusArray.length;
-
-          userStatusArray.forEach(function(element){
-          batchResponse.push(element);
-          --test;
-              
-                if(test <= 100){
-                  console.log("Reached last elements: counter=" + test + " array="+batchResponse.length);
-                  response.writeHead(200, {"Content-Type": "application/json" });
-                  //  response.write(JSON.stringify(batchResponse));
-                  response.end(JSON.stringify(batchResponse));
-                    return;
-                }
-
-          if(batchResponse.length == 100){
-            console.log(200);
-            response.writeHead(200, {"Content-Type": "application/json" });
-          //  response.write(JSON.stringify(batchResponse));
-            response.end(JSON.stringify(batchResponse));
-            batchResponse = [];
-          }
-        });
-      
-      }else {
-        console.log(500);
-        response.writeHead(500, { "Content-Type": "application/json" });
-        response.end("No data");
-      }
+    } else {
+      console.log(500);
+      response.writeHead(500, { "Content-Type": "application/json" });
+      response.end("No data");
     }
+  }
 }
 
 
@@ -311,8 +311,8 @@ function updateProfilePicture(response, request) {
           // }
 
           // });
-        response.end("image updated to default");
-        console.log(userName + " is skipped because of no picture");
+          response.end("image updated to default");
+          console.log(userName + " is skipped because of no picture");
         } else {
           download(image, userId + '.png', function () {
             var img = fs.readFile(userId + '.png', function (err, data) {
