@@ -95,15 +95,13 @@ function userStatus(response, request) {
                 if (err) {
                   console.log(name +" has got no mail account!");
                   ++counter;
-                } else {
-                  console.log("200 OK");
-                  console.log("Instances: " + userMail.length);      
+                } else { 
                   userMail.push(res);
                   ++counter;
                 } 
-
                   if(counter === userArray.length){
-                    console.log("******************** FNISHED *********************");        
+                    console.log("Instances: " + userMail.length);
+                    console.log("200 OK");             
                     response.writeHead(200, { "Content-Type": "application/json" });
                     response.end(JSON.stringify(userMail));
                                   
