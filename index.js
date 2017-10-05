@@ -118,9 +118,19 @@ function userStatus(response, request) {
 
     } else if(request.method == "GET"){
       if(userStatusArray.length != 0){
-        console.log(200);
-        response.writeHead(200, { "Content-Type": "application/json" });
-        response.end(JSON.stringify(userStatusArray));
+          var batchResponse = [];
+          userStatusArray.forEach(function(element){
+          batchResponse.push(element);
+
+          if(batchResponse.length == 100){
+            console.log(200);
+            response.writeHead(200, {"Content-Type": "application/json" });
+          //  response.write(JSON.stringify(batchResponse));
+            response.end(JSON.stringify(batchResponse));
+            batchResponse = [];
+          }
+        });
+      
       }else {
         console.log(500);
         response.writeHead(500, { "Content-Type": "application/json" });
