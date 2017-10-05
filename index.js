@@ -75,11 +75,13 @@ function userStatus(response, request) {
            
         var userMail = [];
         var userArray = JSON.parse(body);
-        console.log("Size of the total users from pipe: " + userArray.length);
+        var limit = userArray.length;
+        console.log("request batch size: " + userArray.length);
         userArray.forEach(function (element) {    
              var id = element["id"];
              var name = element["displayName"];
-
+             
+        if(name != ""){
            // var id = element["o365-user:id"];
             client.api("https://graph.microsoft.com/beta/users/"+ id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
               .get((err, res) => {
@@ -92,7 +94,7 @@ function userStatus(response, request) {
                   userMail.push(res);
                 } 
 
-                  if(userMail.length === userArray.length){
+                  if(userMail.length === limit){
                     console.log("******************** FNISHED *********************");        
                     response.writeHead(200, { "Content-Type": "application/json" });
                     response.end(JSON.stringify(userMail));
@@ -100,10 +102,13 @@ function userStatus(response, request) {
                   }
                 
               });
-       
+
+            }
+
+
             });
 
-
+         
       });
     }
 }
