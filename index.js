@@ -66,7 +66,6 @@ function userStatus(response, request) {
     });
     
     if (request.method == "POST") {
-
       var body = [];
       request.on('data', function (input) {
         body += input;
@@ -77,17 +76,16 @@ function userStatus(response, request) {
          
         var userArray = JSON.parse(body);
         console.log("Size of the total users from pipe: " + userArray.length);
-
         userArray.forEach(function (element) {    
              var id = element["id"];
+             var name = element["displayName"];
+
            // var id = element["o365-user:id"];
             client.api("https://graph.microsoft.com/beta/users/"+ id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
-            //  client.api("https://graph.microsoft.com/beta/users/e97f274a-2a86-4280-997d-8ee4d2c52078/mailboxSettings/automaticRepliesSetting?pretty=1")
               .get((err, res) => {
                 if (err) {
-                  console.log(err);
-                  // response.writeHead(500, { "Content-Type": "application/json" });
-                  // response.end(err);
+                  console.log(name +" has got no mail account!");
+                
                 } else {
                   console.log("200 OK");
                   console.log(res); 
@@ -100,8 +98,7 @@ function userStatus(response, request) {
                     
                     response.writeHead(200, { "Content-Type": "application/json" });
                     response.end(JSON.stringify(userMail));
-                    userMail = [];
-                   
+                                  
                   }
                 
               });
