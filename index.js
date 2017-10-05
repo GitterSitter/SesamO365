@@ -11,6 +11,8 @@ var auth = require('./auth');
 var request = require('request');
 var qs = require('querystring');
 var csvWriter = require('csv-write-stream')
+var userMail = [];
+
 
 var handle = {};
 handle['/photo'] = updateProfilePicture;
@@ -72,11 +74,13 @@ function userStatus(response, request) {
           request.connection.destroy();
         }
            
-        var data = [];   
+         
         var userArray = JSON.parse(body);
+        console.log("Size of the total users from pipe: " + userArray.length);
+
         userArray.forEach(function (element) {    
-            var id = element["id"];
-            //var id = element["o365-user:id"];
+             var id = element["id"];
+           // var id = element["o365-user:id"];
             client.api("https://graph.microsoft.com/beta/users/"+ id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
             //  client.api("https://graph.microsoft.com/beta/users/e97f274a-2a86-4280-997d-8ee4d2c52078/mailboxSettings/automaticRepliesSetting?pretty=1")
               .get((err, res) => {
@@ -87,14 +91,17 @@ function userStatus(response, request) {
                 } else {
                   console.log("200 OK");
                   console.log(res); 
-                  console.log("Instances: " + data.length);      
-                  data.push(res);
+                  console.log("Instances: " + userMail.length);      
+                  userMail.push(res);
                 } 
 
-                  if(userArray.length === data.length){
-                    console.log("*****************************************************");
+                  if(userArray.length === userMail.length){
+                    console.log("******************** FNISHED *********************");
+                    
                     response.writeHead(200, { "Content-Type": "application/json" });
-                    response.end(JSON.stringify(data));
+                    response.end(JSON.stringify(userMail));
+                    userMail = [];
+                   
                   }
                 
               });
