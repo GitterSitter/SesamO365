@@ -17,6 +17,7 @@ handle['/photo'] = updateProfilePicture;
 handle['/users'] = users;
 handle['/groups'] = groups;
 handle['/file'] = shareFile;
+handle['/status'] = userStatus;
 
 server.start(router.route, handle);
 
@@ -51,6 +52,61 @@ function getNewToken() {
     console.error('>>> Error getting access token: ' + error);
   });
 }
+
+
+function userStatus(response, request) {
+  getNewToken();
+  
+    var client = microsoftGraph.Client.init({
+      authProvider: (done) => {
+        done(null, token);
+      }
+    });
+    
+    if (request.method == "POST") {
+
+      var body = [];
+      request.on('data', function (input) {
+        body += input;
+        if (body.length > 1e6) {
+          request.connection.destroy();
+        }
+           
+        var data = [];   
+        var userArray = JSON.parse(body);
+        userArray.forEach(function (element) {    
+            var id = element["id"];
+            //var id = element["o365-user:id"];
+            client.api("https://graph.microsoft.com/beta/users/"+ id + "/mailboxSettings/automaticRepliesSetting?pretty=1")
+            //  client.api("https://graph.microsoft.com/beta/users/e97f274a-2a86-4280-997d-8ee4d2c52078/mailboxSettings/automaticRepliesSetting?pretty=1")
+              .get((err, res) => {
+                if (err) {
+                  console.log(err);
+                  // response.writeHead(500, { "Content-Type": "application/json" });
+                  // response.end(err);
+                } else {
+                  console.log("200 OK");
+                  console.log(res); 
+                  console.log("Instances: " + data.length);      
+                  data.push(res);
+                } 
+
+                  if(userArray.length === data.length){
+                    console.log("*****************************************************");
+                    response.writeHead(200, { "Content-Type": "application/json" });
+                    response.end(JSON.stringify(data));
+                  }
+                
+              });
+       
+            });
+
+
+      });
+    }
+}
+
+
 
 
 function groups(response, request) {
@@ -263,20 +319,6 @@ var download = function (uri, filename, callback) {
 
 
 
-// reader.addEventListener("load", function () {
-// 	client
-// 		.api('/users/e97f274a-2a86-4280-997d-8ee4d2c52078/photo/$value')
-// 		.put(file, (err, res) => {
-// 			if (err) {
-// 				console.log(err);
-// 				return;
-// 			}
-// 			console.log("We've updated your picture!");
-// 		});
-// }, false);
-// if (file) {
-// 	//reader.readAsDataURL(file);
-// }
 
 
 // function photoDownload(response, request, userId) {
