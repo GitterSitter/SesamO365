@@ -97,8 +97,14 @@ function userStatus(response, request) {
               console.log(name + " has got no mail account!");
               ++counter;
             } else {
-              userMail.push(res);
-              userStatusArray.push(res);
+
+          //    "status": "disabled"
+              if(res["status"] != "disabled"){
+                userMail.push(res);
+                userStatusArray.push(res);
+                console.log(res["status"]);
+              }
+             
               ++counter;
             }
             if (counter === userArray.length) {
@@ -121,7 +127,6 @@ function userStatus(response, request) {
     console.log("GET REQUEST");
 
     if (userStatusArray.length != 0) {
-
        var batchResponse = [];
       
         userStatusArray.forEach(function (element) {
@@ -132,7 +137,7 @@ function userStatus(response, request) {
           console.log("Reached last elements: counter=" + test + " array=" + batchResponse.length);
          // response.writeHead(200, { "Content-Type": "application/json" });
           response.end(JSON.stringify(userStatusArray));
-          return null;
+          return true;
         }
 
         if (batchResponse.length == 100) {
