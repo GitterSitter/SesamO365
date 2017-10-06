@@ -122,9 +122,6 @@ function userStatus(response, request) {
 
 
   } else if (request.method == "GET") {
-  
-
-    console.log("GET REQUEST");
     console.log("userStatusArray size: " + userStatusArray.length);
 
     if (userStatusArray.length > 0) {
@@ -132,18 +129,13 @@ function userStatus(response, request) {
       
        if (userStatusArray.length < 100) {
         console.log("Reached last elements:"  + userStatusArray.length);
-        //response.writeHead(200, { "Content-Type": "application/json" });
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify(userStatusArray));
-       // response.end(userStatusArray);
         return;
-
-
       }else{
    //userStatusArray.forEach(function (element) {
     for (let element of userStatusArray){
       batchResponse.push(element);
-     
       if (batchResponse.length == 100) {
         console.log(200);
         response.writeHead(200, { "Content-Type": "application/json" });  
@@ -157,11 +149,6 @@ function userStatus(response, request) {
     }
 
       }
-
-     
-
-    
-
 
 
     //  });
