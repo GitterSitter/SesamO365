@@ -122,7 +122,7 @@ function userStatus(response, request) {
 
 
   } else if (request.method == "GET") {
-    response.writeHead(200, { "Content-Type": "application/json" });
+  
 
     console.log("GET REQUEST");
     console.log("userStatusArray size: " + userStatusArray.length);
@@ -133,9 +133,8 @@ function userStatus(response, request) {
        if (userStatusArray.length < 100) {
         console.log("Reached last elements:"  + userStatusArray.length);
         //response.writeHead(200, { "Content-Type": "application/json" });
-        var test = [{'test':'test'}];
-
-        response.end(JSON.stringify(test));
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify(userStatusArray));
        // response.end(userStatusArray);
         return;
 
@@ -149,7 +148,6 @@ function userStatus(response, request) {
         console.log(200);
         response.writeHead(200, { "Content-Type": "application/json" });  
         response.end(JSON.stringify(batchResponse));
-       
         batchResponse = [];
       
       }
