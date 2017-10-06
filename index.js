@@ -135,7 +135,10 @@ function userStatus(response, request) {
        if (userStatusArray.length < 100) {
         console.log("Reached last elements:"  + userStatusArray.length);
         response.writeHead(200, { "Content-Type": "application/json" });
-        response.end(JSON.stringify(userStatusArray.length));
+    
+        response.end(JSON.stringify("wohoo"));
+
+        console.log(JSON.stringify(userStatusArray));
        // response.end(userStatusArray);
     //  return true;
       }else{
@@ -145,9 +148,9 @@ function userStatus(response, request) {
      
       if (batchResponse.length == 100) {
         console.log(200);
-        response.writeHead(200, { "Content-Type": "application/json" });
-      response.write(JSON.stringify("wohoo"));
-       // response.end(JSON.stringify(batchResponse));
+        response.writeHead(200, { "Content-Type": "application/json" });  
+        response.end(JSON.stringify(batchResponse));
+       
         batchResponse = [];
       
       }
