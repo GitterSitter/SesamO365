@@ -122,25 +122,24 @@ function userStatus(response, request) {
 
 
   } else if (request.method == "GET") {
+    response.writeHead(200, { "Content-Type": "application/json" });
 
     console.log("GET REQUEST");
     console.log("userStatusArray size: " + userStatusArray.length);
 
-
-
     if (userStatusArray.length > 0) {
        var batchResponse = [];
       
-
        if (userStatusArray.length < 100) {
         console.log("Reached last elements:"  + userStatusArray.length);
-        response.writeHead(200, { "Content-Type": "application/json" });
-    
-        response.end(JSON.stringify("wohoo"));
+        //response.writeHead(200, { "Content-Type": "application/json" });
+        response.end("test");
 
         console.log(JSON.stringify(userStatusArray));
        // response.end(userStatusArray);
-    //  return true;
+        return;
+
+
       }else{
    //userStatusArray.forEach(function (element) {
     for (let element of userStatusArray){
