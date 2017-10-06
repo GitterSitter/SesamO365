@@ -134,10 +134,10 @@ function userStatus(response, request) {
         userStatusArray.splice(element, 1);
 
         if (userStatusArray.length < 100) {
-          console.log("Reached last elements: counter=" + test + " array=" + batchResponse.length);
+          console.log("Reached last elements:"  + userStatusArray.length);
          // response.writeHead(200, { "Content-Type": "application/json" });
           response.end(JSON.stringify(userStatusArray));
-          return true;
+          return;
         }
 
         if (batchResponse.length == 100) {
