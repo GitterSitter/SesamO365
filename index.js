@@ -133,12 +133,13 @@ function userStatus(response, request) {
       for (let element of userStatusArray){
 
         batchResponse.push(element);
-        userStatusArray.splice(element, 1);
+       
 
         if (userStatusArray.length < 100) {
           console.log("Reached last elements:"  + userStatusArray.length);
           response.writeHead(200, { "Content-Type": "application/json" });
-          response.end(JSON.stringify(userStatusArray));
+          //response.end(JSON.stringify(userStatusArray));
+          response.end(userStatusArray);
           return;
         }
 
@@ -149,6 +150,8 @@ function userStatus(response, request) {
           response.end(JSON.stringify(batchResponse));
           batchResponse = [];
         }
+
+        userStatusArray.splice(element, 1);
 
       }
 
