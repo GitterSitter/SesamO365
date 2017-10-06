@@ -140,7 +140,7 @@ function userStatus(response, request) {
           response.writeHead(200, { "Content-Type": "application/json" });
           response.end(JSON.stringify(userStatusArray));
          // response.end(userStatusArray);
-          return;
+          return true;
         }
 
         if (batchResponse.length == 100) {
@@ -161,6 +161,7 @@ function userStatus(response, request) {
       console.log("No data");
       response.writeHead(200, { "Content-Type": "application/json" });
       response.end("No data");
+      return;
     }
   }
 }
