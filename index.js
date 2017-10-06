@@ -98,8 +98,8 @@ function userStatus(response, request) {
               ++counter;
             } else {
 
-          //    "status": "disabled"
               if(res["status"] != "disabled"){
+                res.id = id;
                 userMail.push(res);
                 userStatusArray.push(res);
               }
@@ -110,7 +110,6 @@ function userStatus(response, request) {
               console.log("Instances: " + userMail.length);
               console.log("200 OK");
               response.writeHead(200, { "Content-Type": "application/json" });
-              //  response.end(JSON.stringify(userMail));
               response.end("200");
 
             }
@@ -122,7 +121,7 @@ function userStatus(response, request) {
 
 
   } else if (request.method == "GET") {
-    console.log("userStatusArray size: " + userStatusArray.length);
+    console.log("Amount of users with status: " + userStatusArray.length);
 
     if (userStatusArray.length > 0) {
        var batchResponse = [];
@@ -132,26 +131,31 @@ function userStatus(response, request) {
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify(userStatusArray));
         return;
-      }else{
-   //userStatusArray.forEach(function (element) {
-    for (let element of userStatusArray){
-      batchResponse.push(element);
-      if (batchResponse.length == 100) {
-        console.log(200);
-        response.writeHead(200, { "Content-Type": "application/json" });  
-        response.end(JSON.stringify(batchResponse));
-        batchResponse = [];
-      
-      }
 
-     // userStatusArray.splice(element, 1);
+      } else {
+     var counter = userStatusArray;
+      for (let element of userStatusArray){
+          batchResponse.push(element);
+          counter.splice(element, 1);
+
+          if (batchResponse.length == 100) {
+            console.log(200);
+            response.writeHead(200, { "Content-Type": "application/json" });  
+            response.end(JSON.stringify(batchResponse));
+            batchResponse = [];
+          
+          }
+
+          if(counter.length < 100){
+
+            response.writeHead(200, { "Content-Type": "application/json" });  
+            response.end(JSON.stringify(counter));
+            return;
+          }
 
     }
 
       }
-
-
-    //  });
 
     } else {
       console.log("No data");
