@@ -133,9 +133,9 @@ function userStatus(response, request) {
        if (userStatusArray.length < 100) {
         console.log("Reached last elements:"  + userStatusArray.length);
         //response.writeHead(200, { "Content-Type": "application/json" });
-        response.end("[{'test':'test'}]");
+        var test = [{'test':'test'}];
 
-        console.log(JSON.stringify(userStatusArray));
+        response.end(JSON.stringify(test));
        // response.end(userStatusArray);
         return;
 
