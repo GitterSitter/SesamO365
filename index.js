@@ -102,7 +102,6 @@ function userStatus(response, request) {
               if(res["status"] != "disabled"){
                 userMail.push(res);
                 userStatusArray.push(res);
-                console.log(res["status"]);
               }
              
               ++counter;
@@ -129,7 +128,9 @@ function userStatus(response, request) {
     if (userStatusArray.length != 0) {
        var batchResponse = [];
       
-        userStatusArray.forEach(function (element) {
+        //userStatusArray.forEach(function (element) {
+      for (let element of userStatusArray){
+
         batchResponse.push(element);
         userStatusArray.splice(element, 1);
 
@@ -148,7 +149,9 @@ function userStatus(response, request) {
           batchResponse = [];
         }
 
-      });
+      }
+
+    //  });
 
     } else {
       console.log("No data");
