@@ -350,17 +350,19 @@ function updateProfilePicture(response, request) {
                   } else {
                     response.end("image updated!");
                     console.log(userName + "s image updated!");
+
+                    fs.unlink( "./" + userId + '.png', function(err) {
+                      if(err){
+                        console.log("Cant remove file!");
+                      }
+                          console.log(userId + '.png' + " deleted");
+                    });
+
                   }
 
                 });
 
-              // fs.unlink( "./" + userId + '.png', function(err) {
-              //   if(err){
-              //     console.log("Cant remove file!");
-              //   }
-              //       console.log(userId + '.png' + " deleted");
-              // });
-
+           
             });
           });
 
