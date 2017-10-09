@@ -318,21 +318,7 @@ function updateProfilePicture(response, request) {
         }
 
         if (image === null || image === "") {
-          //     fs.readFile('./leaf.png',function(err,img){
-          //     if(!err){
-          //         client.api("/users/" + userId + "/photo/$value")
-          //         .put(img, (err, res) => {
-          //           if (err) {
-          //             console.log("Error setting profile image!" );
-          //           }else {
-          //             response.end("image updated to default");
-          //             console.log( userName + "s image updated to default");
 
-          //           }
-          //   });
-          // }
-
-          // });
           response.end("is skipped because of no picture");
           console.log(userName + " is skipped because of no picture");
         } else {
@@ -340,6 +326,7 @@ function updateProfilePicture(response, request) {
             var img = fs.readFile(userId + '.png', function (err, data) {
               if (err) {
                 console.log(+"Error downloading file: " + err);
+                return;
               } else {
 
               console.log("Image downloaded!");
@@ -347,6 +334,8 @@ function updateProfilePicture(response, request) {
                 .put(data, (err, res) => {
                   if (err) {
                     console.log("Error setting downloaded profile image for user " + userName);
+                    response.end("Error setting downloaded profile image for user " + userName);
+                    return;
                   } else {
                     response.end("image updated!");
                     console.log(userName + "s image updated!");
