@@ -333,7 +333,7 @@ function updateProfilePicture(response, request) {
           // }
 
           // });
-          response.end("image updated to default");
+          response.end("is skipped because of no picture");
           console.log(userName + " is skipped because of no picture");
         } else {
           download(image, userId + '.png', function () {
@@ -354,8 +354,10 @@ function updateProfilePicture(response, request) {
                     fs.unlink( "./" + userId + '.png', function(err) {
                       if(err){
                         console.log("Cant remove file!");
+                      }else {
+                        console.log(userId + '.png' + " deleted");
                       }
-                          console.log(userId + '.png' + " deleted");
+                      
                     });
 
                   }
