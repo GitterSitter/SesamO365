@@ -11,7 +11,7 @@ var auth = require('./auth');
 var request = require('request');
 var qs = require('querystring');
 var csvWriter = require('csv-write-stream')
-
+var token = "";
 var userStatusArray = [];
 
 
@@ -24,7 +24,15 @@ handle['/status'] = userStatus;
 
 server.start(router.route, handle);
 
-var token = "";
+var count = 0;
+
+//Requesting a new token every hour as the old one expires
+function refreshToken()
+{ 
+  getNewToken();
+}
+setInterval(refreshToken, 60*60*1000);
+
 
 function saveToken(tok) {
   token = tok;
@@ -41,7 +49,6 @@ auth.getAccessToken().then(function (token) {
 }, function (error) {
   console.error('>>> Error getting access token: ' + error);
 });
-
 
 
 function getNewToken() {
@@ -469,11 +476,8 @@ function shareFile(response, request) {
         throw err;
       } else {
         client
-          .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
-          //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')
-          //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/root/children/orgMap.csv/content')      
+          .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')  
           //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/orgMap.csv/content') 
-          //  .top(10) 
           .put(data, (err, res) => {
             if (err) {
               console.log(err);
