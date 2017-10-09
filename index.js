@@ -304,6 +304,11 @@ function updateProfilePicture(response, request) {
 
       var data = JSON.parse(body);
 
+      if(data.length === 0){
+        response.end("no data");
+        return;
+      }
+
       data.forEach(function (element) {
         var image = "";
         var test = "";
@@ -333,6 +338,7 @@ function updateProfilePicture(response, request) {
               client.api("/users/" + userId + "/photo/$value")
                 .put(data, (err, res) => {
                   if (err) {
+                    console.log(err);
                     console.log("Error setting downloaded profile image for user " + userName);
                     response.end("Error setting downloaded profile image for user " + userName);
                     return;
