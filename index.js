@@ -340,13 +340,13 @@ function updateProfilePicture(response, request) {
             var img = fs.readFile(userId + '.png', function (err, data) {
               if (err) {
                 console.log(+"Error downloading file: " + err);
-              }
+              } else {
 
               console.log("Image downloaded!");
               client.api("/users/" + userId + "/photo/$value")
                 .put(data, (err, res) => {
                   if (err) {
-                    console.log("Error setting downloaded profile image");
+                    console.log("Error setting downloaded profile image for user " + userName);
                   } else {
                     response.end("image updated!");
                     console.log(userName + "s image updated!");
@@ -364,7 +364,8 @@ function updateProfilePicture(response, request) {
 
                 });
 
-           
+              }
+
             });
           });
 
