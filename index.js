@@ -416,8 +416,6 @@ function shareFile(response, request) {
           nameDepartmentHead = element["DepartmentHead"]["Navn"];
         }
 
-        //  console.log(typeof element["ParentDepartment"][0]["ParentName"][0]  != "undefined" );
-
         if (typeof element["ParentDepartment"][0] != 'undefined' && element["ParentDepartment"][0]["ParentName"][0] != null) {
           parentName = element["ParentDepartment"][0]["ParentName"][0];
         }
