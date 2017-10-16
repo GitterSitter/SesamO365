@@ -101,7 +101,6 @@ function userStatus(response, request) {
                 userMail.push(res);
                 userStatusArray.push(res);
               }
-
               ++counter;
             }
             if (counter === userArray.length) {
