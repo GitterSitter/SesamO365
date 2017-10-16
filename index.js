@@ -14,7 +14,6 @@ var csvWriter = require('csv-write-stream')
 var token = "";
 var userStatusArray = [];
 
-
 var handle = {};
 handle['/photo'] = updateProfilePicture;
 handle['/users'] = users;
@@ -24,15 +23,11 @@ handle['/status'] = userStatus;
 
 server.start(router.route, handle);
 
-var count = 0;
-
-//Requesting a new token every hour as the old one expires
-function refreshToken()
-{ 
+//Requesting a new token every second hour as the old one expires
+function refreshToken() {
   getNewToken();
 }
-setInterval(refreshToken, 60*60*1000);
-
+setInterval(refreshToken, 60 * 120 * 1000);
 
 function saveToken(tok) {
   token = tok;
@@ -40,7 +35,6 @@ function saveToken(tok) {
 
 //If expired, request new token in the methods!
 auth.getAccessToken().then(function (token) {
-  // console.log(token);
   saveToken(token)
     .then(function (tok) {
     }, function (error) {
@@ -64,16 +58,13 @@ function getNewToken() {
 }
 
 
-
 function userStatus(response, request) {
-  getNewToken();
 
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
     }
   });
-
 
   if (request.method == "POST") {
     var body = [];
@@ -105,12 +96,12 @@ function userStatus(response, request) {
               ++counter;
             } else {
 
-              if(res["status"] != "disabled"){
+              if (res["status"] != "disabled") {
                 res.id = id;
                 userMail.push(res);
                 userStatusArray.push(res);
               }
-             
+
               ++counter;
             }
             if (counter === userArray.length) {
@@ -129,38 +120,35 @@ function userStatus(response, request) {
 
   } else if (request.method == "GET") {
     console.log("Amount of users with status: " + userStatusArray.length);
-
     if (userStatusArray.length > 0) {
-       var batchResponse = [];
-      
-       if (userStatusArray.length < 100) {
-        console.log("Reached last elements:"  + userStatusArray.length);
+      var batchResponse = [];
+
+      if (userStatusArray.length < 100) {
+        console.log("Reached last elements:" + userStatusArray.length);
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify(userStatusArray));
         return;
 
       } else {
-     var counter = userStatusArray;
-      for (let element of userStatusArray){
+        var counter = userStatusArray;
+        for (let element of userStatusArray) {
           batchResponse.push(element);
           counter.splice(element, 1);
 
           if (batchResponse.length == 100) {
             console.log(200);
-            response.writeHead(200, { "Content-Type": "application/json" });  
+            response.writeHead(200, { "Content-Type": "application/json" });
             response.end(JSON.stringify(batchResponse));
             batchResponse = [];
-          
+
           }
 
-          if(counter.length < 100){
-
-            response.writeHead(200, { "Content-Type": "application/json" });  
+          if (counter.length < 100) {
+            response.writeHead(200, { "Content-Type": "application/json" });
             response.end(JSON.stringify(counter));
             return;
           }
-
-    }
+        }
 
       }
 
@@ -176,7 +164,6 @@ function userStatus(response, request) {
 
 
 function groups(response, request) {
-  getNewToken();
 
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
@@ -209,7 +196,6 @@ function groups(response, request) {
 
 
 function users(response, request) {
-  getNewToken();
 
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
@@ -222,8 +208,9 @@ function users(response, request) {
     //If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
     //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
     //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
+ // On premise AD hindrer updates
 
-    var userId = request.data;   //"e97f274a-2a86-4280-997d-8ee4d2c52078"; 
+    var userId = request.data;  
     client.api("/users/" + userId + "/displayName")
       .patch(
       { "value": "Test" },
@@ -304,7 +291,7 @@ function updateProfilePicture(response, request) {
 
       var data = JSON.parse(body);
 
-      if(data.length === 0){
+      if (data.length === 0) {
         response.end("no data");
         return;
       }
@@ -332,32 +319,32 @@ function updateProfilePicture(response, request) {
               if (err) {
                 console.log(+"Error downloading file: " + err);
                 return;
+
               } else {
+                console.log("Image downloaded!");
+                client.api("/users/" + userId + "/photo/$value")
+                  .put(data, (err, res) => {
+                    if (err) {
+                      console.log(err);
+                      console.log("Error setting downloaded profile image for user " + userName);
+                      response.end("Error setting downloaded profile image for user " + userName);
+                      return;
+                    } else {
+                      response.end("image updated!");
+                      console.log(userName + "s image updated!");
 
-              console.log("Image downloaded!");
-              client.api("/users/" + userId + "/photo/$value")
-                .put(data, (err, res) => {
-                  if (err) {
-                    console.log(err);
-                    console.log("Error setting downloaded profile image for user " + userName);
-                    response.end("Error setting downloaded profile image for user " + userName);
-                    return;
-                  } else {
-                    response.end("image updated!");
-                    console.log(userName + "s image updated!");
+                      fs.unlink("./" + userId + '.png', function (err) {
+                        if (err) {
+                          console.log("Cant remove file!");
+                        } else {
+                          console.log(userId + '.png' + " deleted");
+                        }
 
-                    fs.unlink( "./" + userId + '.png', function(err) {
-                      if(err){
-                        console.log("Cant remove file!");
-                      }else {
-                        console.log(userId + '.png' + " deleted");
-                      }
-                      
-                    });
+                      });
 
-                  }
+                    }
 
-                });
+                  });
 
               }
 
@@ -382,43 +369,10 @@ var download = function (uri, filename, callback) {
 };
 
 
-// function photoDownload(response, request, userId) {
-
-//    userId = "e97f274a-2a86-4280-997d-8ee4d2c52078";
-//     var client = microsoftGraph.Client.init({
-//       authProvider: (done) => {
-//         done(null, token);
-//       }
-//     });
-
-//    client
-//       .api('users/'+userId+'/photo/$value')
-//       .responseType('blob')
-//       .getStream((err, downloadStream) => {
-//         let writeStream = fs.createWriteStream('../myPhoto.jpg');
-//         downloadStream.pipe(writeStream).on('error', console.log);
-
-//         if (err) {
-//           console.log('error: ' + err);
-//           response.write('<p>ERROR: ' + err + '</p>');
-//           response.end();
-//         } else {   
-
-//       // let profilePhotoReadStream = fs.createReadStream('me.jpg');
-//         //  console.log(downloadStream);
-//         console.log("Image downloaded!")
-//           response.end();
-//         }
-//       });
-
-// }
-
-
 function shareFile(response, request) {
   if (request.method == "POST") {
     var data = "";
     var body = "";
-
 
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
@@ -440,33 +394,40 @@ function shareFile(response, request) {
     request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
-      // var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
-      var writer = csvWriter({ headers: ["", "", "", ""] })
-      writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }))
+      var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
+
+      // var writer = csvWriter({ headers: ["","","",""] });
+      writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
       dataArray.forEach(function (element) {
+        var parentName = "No Department Parent";
+        var depId = "No Department Id";
+        var nameDepartmentHead = "No Department Head";
+        var depName = "No Department Name";
 
-        var depName = element["DepartmentName"];
+        if (element["DepartmentName"] != null) {
+          depName = element["DepartmentName"];
+        }
 
-        var depId = "";
-        if (element["DepartmentId"] != "_Scurrenttime-department:departmentref") {
+        if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && element["DepartmentId"] != null) {
           depId = element["DepartmentId"];
         }
 
-        var name = "";
         if (element["DepartmentHead"] != null) {
-          name = element["DepartmentHead"]["Navn"];
-        } else {
-          name = "NA"
+          nameDepartmentHead = element["DepartmentHead"]["Navn"];
         }
 
-        var parentName = "";
-        if (element["ParentDepartment"] != 0) {
+        //  console.log(typeof element["ParentDepartment"][0]["ParentName"][0]  != "undefined" );
+
+        if (typeof element["ParentDepartment"][0] != 'undefined' && element["ParentDepartment"][0]["ParentName"][0] != null) {
           parentName = element["ParentDepartment"][0]["ParentName"][0];
         }
 
-        writer.write([depId, depName, parentName, name])
+        writer.write([depId, depName, parentName, nameDepartmentHead]);
+
       }, this);
-      writer.end()
+
+
+      writer.end();
     });
 
 
@@ -476,8 +437,7 @@ function shareFile(response, request) {
         throw err;
       } else {
         client
-          .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')  
-          //  .api('users/e97f274a-2a86-4280-997d-8ee4d2c52078/drive/items/01DP2XB3GMZQKCKZ6GKRFL5ZE3BCTVJJ5S/orgMap.csv/content') 
+          .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
           .put(data, (err, res) => {
             if (err) {
               console.log(err);
