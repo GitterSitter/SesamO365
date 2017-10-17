@@ -389,20 +389,20 @@ function shareFile(response, request) {
    
       is_last = request.url.includes("is_last=true");
 
-    });
-
-    console.log(is_last + " IS LAST ****");
-    response.write("200");
-    response.end();
-
-    request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
       orgDataArray.concat(dataArray);
 
+    });
 
+   
+    response.write("200");
+    response.end();
+
+    request.on('end', function () {
+   
       console.log(orgDataArray.length + " length of instances");
-
+      console.log(is_last + " IS LAST ****");
       if(is_last){
 
         console.log("FINAL REQUEST REACHED!");
