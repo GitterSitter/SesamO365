@@ -27,7 +27,7 @@ server.start(router.route, handle);
 function refreshToken() {
   getNewToken();
 }
-setInterval(refreshToken, 60 * 120 * 1000);
+setInterval(refreshToken, 60 * 60 * 1000);
 
 function saveToken(tok) {
   token = tok;
@@ -386,6 +386,12 @@ function shareFile(response, request) {
 
     });
 
+    console.log(body);
+    console.log("***********************************************************************");
+    console.log(body.is_last);
+
+
+
     response.write("200");
     response.end();
 
@@ -401,20 +407,20 @@ function shareFile(response, request) {
         var depId = "No Department Id";
         var nameDepartmentHead = "No Department Head";
         var depName = "No Department Name";
-
-        if (element["DepartmentName"] != null) {
+     
+        if (typeof element["DepartmentName"] != 'undefined') {
           depName = element["DepartmentName"];
         }
 
-        if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && element["DepartmentId"] != null) {
+        if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && typeof element["DepartmentId"] != 'undefined') {
           depId = element["DepartmentId"];
         }
 
-        if (element["DepartmentHead"] != null) {
+        if (typeof element["DepartmentHead"] != 'undefined') {
           nameDepartmentHead = element["DepartmentHead"]["Navn"];
         }
 
-        if (typeof element["ParentDepartment"][0] != 'undefined' && element["ParentDepartment"][0]["ParentName"][0] != null) {
+        if (typeof element["ParentDepartment"][0] != 'undefined' && typeof element["ParentDepartment"][0]["ParentName"][0] != 'undefined') {
           parentName = element["ParentDepartment"][0]["ParentName"][0];
         }
 
