@@ -373,7 +373,7 @@ function shareFile(response, request) {
   if (request.method == "POST") {
     var data = "";
     var body = "";
-    var is_last = "";
+    var is_last = false;
 
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
@@ -387,11 +387,11 @@ function shareFile(response, request) {
         request.connection.destroy();
       }
    
-      is_last = request.url;
+      is_last = request.url.includes("is_last=true");
 
     });
 
-
+    console.log(is_last + " IS LAST ****");
     response.write("200");
     response.end();
 
@@ -400,9 +400,14 @@ function shareFile(response, request) {
       var dataArray = JSON.parse(data);
       orgDataArray.concat(dataArray);
 
-      if(is_last.includes("is_last=true")){
 
-    
+      console.log(orgDataArray.length + " length of instances");
+
+      if(is_last){
+
+        console.log("FINAL REQUEST REACHED!");
+
+
       var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
       writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
       orgDataArray.forEach(function (element) {
@@ -432,15 +437,15 @@ function shareFile(response, request) {
       }, this);
 
       writer.end();
-      orgDataArray = [];
 
+     
     }
     
 
     });
 
-    if(is_last.includes("is_last=true")){
-      
+    if(is_last){
+      console.log("FINAL REQUEST REACHED READING FILE....");
     fs.readFile("./orgMap.csv", "utf8", function (err, data) {
       data = "\ufeff" + data;
       if (err) {
@@ -451,7 +456,8 @@ function shareFile(response, request) {
           .put(data, (err, res) => {
             if (err) {
               console.log(err);
-            } else {
+            } else {         
+              orgDataArray = [];      
               console.log("File updated!");
             }
           });
