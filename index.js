@@ -396,7 +396,12 @@ function shareFile(response, request) {
       if(is_last){
         var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
         writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-        orgDataArray.forEach(function (element) {
+
+        console.log(orgDataArray.length);
+        console.log(orgDataArray);
+var count = 0;
+          orgDataArray.forEach(function (element) {
+            console.log(++count);
           var parentName = "No Department Parent";
           var depId = "No Department Id";
           var nameDepartmentHead = "No Department Head";
@@ -423,7 +428,7 @@ function shareFile(response, request) {
         }, this);
   
         writer.end();
-  
+        console.log("ENDED writing session...");
       }
 
     });
