@@ -415,23 +415,20 @@ function shareFile(response, request) {
           if (typeof element["ParentDepartment"][0] != 'undefined' &&  element["ParentDepartment"][0]["ParentName"][0] != null) {
             parentName = element["ParentDepartment"][0]["ParentName"][0];
           }
-
           writer.write([depId, depName, parentName, nameDepartmentHead]);
   
         }, this);
   
-        writer.end();
-        
+        writer.end();       
       }
-
     });
 
     response.write("200");
     response.end();
 
     request.on('end', function () {
-      if(is_last){
-       
+      
+      if(is_last){     
       fs.readFile("./orgMap.csv", "utf8", function (err, data) {
         data = "\ufeff" + data;
         if (err) {
@@ -453,7 +450,6 @@ function shareFile(response, request) {
     }
     
     });
-
 
   }
 }
