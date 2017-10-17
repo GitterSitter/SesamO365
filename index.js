@@ -438,10 +438,8 @@ function shareFile(response, request) {
 
       writer.end();
 
-     
     }
     
-
     });
 
     if(is_last){
