@@ -383,12 +383,12 @@ function shareFile(response, request) {
       if (body.length > 1e6) {
         request.connection.destroy();
       }
-
+      console.log(body);
+      console.log("***********************************************************************");
+      console.log(body.is_last);
+      console.log(request.is_last);
+      console.log(request);
     });
-
-    console.log(body);
-    console.log("***********************************************************************");
-    console.log(body.is_last);
 
 
 
@@ -408,19 +408,19 @@ function shareFile(response, request) {
         var nameDepartmentHead = "No Department Head";
         var depName = "No Department Name";
      
-        if (typeof element["DepartmentName"] != 'undefined') {
+        if (element["DepartmentName"] != null) {
           depName = element["DepartmentName"];
         }
 
-        if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && typeof element["DepartmentId"] != 'undefined') {
+        if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && element["DepartmentId"] != null) {
           depId = element["DepartmentId"];
         }
 
-        if (typeof element["DepartmentHead"] != 'undefined') {
+        if ( element["DepartmentHead"] != null) {
           nameDepartmentHead = element["DepartmentHead"]["Navn"];
         }
 
-        if (typeof element["ParentDepartment"][0] != 'undefined' && typeof element["ParentDepartment"][0]["ParentName"][0] != 'undefined') {
+        if (typeof element["ParentDepartment"][0] != 'undefined' &&  element["ParentDepartment"][0]["ParentName"][0] != null) {
           parentName = element["ParentDepartment"][0]["ParentName"][0];
         }
 
