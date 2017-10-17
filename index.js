@@ -391,8 +391,10 @@ function shareFile(response, request) {
 
       data = body;
       var dataArray = JSON.parse(data);
-      orgDataArray.concat(dataArray);
-
+      orgDataArray = orgDataArray.concat(dataArray);
+      console.log(dataArray.length);
+      console.log(orgDataArray.length);
+      console.log("Frist here...");
     });
 
    
@@ -400,13 +402,12 @@ function shareFile(response, request) {
     response.end();
 
     request.on('end', function () {
-   
+
+      console.log("then here...");
       console.log(orgDataArray.length + " length of instances");
-      console.log(is_last + " IS LAST ****");
+ 
+
       if(is_last){
-
-        console.log("FINAL REQUEST REACHED!");
-
 
       var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
       writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
