@@ -392,9 +392,6 @@ function shareFile(response, request) {
         orgDataArray = orgDataArray.concat(dataArray);
       }
 
-      is_last = true;
-        console.log(dataArray.length);
-
       if(is_last){
         var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
         //writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
