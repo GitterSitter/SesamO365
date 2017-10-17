@@ -428,7 +428,6 @@ function shareFile(response, request) {
 
     });
 
-   
     response.write("200");
     response.end();
     request.on('end', function () {
