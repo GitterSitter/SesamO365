@@ -392,77 +392,71 @@ function shareFile(response, request) {
       data = body;
       var dataArray = JSON.parse(data);
       orgDataArray = orgDataArray.concat(dataArray);
-      console.log(dataArray.length);
-      console.log(orgDataArray.length);
-      console.log("Frist here...");
+
+      if(is_last){
+        var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
+        writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
+        orgDataArray.forEach(function (element) {
+          var parentName = "No Department Parent";
+          var depId = "No Department Id";
+          var nameDepartmentHead = "No Department Head";
+          var depName = "No Department Name";
+       
+          if (element["DepartmentName"] != null) {
+            depName = element["DepartmentName"];
+          }
+  
+          if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && element["DepartmentId"] != null) {
+            depId = element["DepartmentId"];
+          }
+  
+          if ( element["DepartmentHead"] != null) {
+            nameDepartmentHead = element["DepartmentHead"]["Navn"];
+          }
+  
+          if (typeof element["ParentDepartment"][0] != 'undefined' &&  element["ParentDepartment"][0]["ParentName"][0] != null) {
+            parentName = element["ParentDepartment"][0]["ParentName"][0];
+          }
+  
+          writer.write([depId, depName, parentName, nameDepartmentHead]);
+  
+        }, this);
+  
+        writer.end();
+  
+      }
+
+
+
     });
 
    
     response.write("200");
     response.end();
-
     request.on('end', function () {
-
-      console.log("then here...");
-      console.log(orgDataArray.length + " length of instances");
- 
-
       if(is_last){
-
-      var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
-      writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-      orgDataArray.forEach(function (element) {
-        var parentName = "No Department Parent";
-        var depId = "No Department Id";
-        var nameDepartmentHead = "No Department Head";
-        var depName = "No Department Name";
-     
-        if (element["DepartmentName"] != null) {
-          depName = element["DepartmentName"];
+        console.log("FINAL REQUEST REACHED READING FILE....");
+      fs.readFile("./orgMap.csv", "utf8", function (err, data) {
+        data = "\ufeff" + data;
+        if (err) {
+          throw err;
+        } else {
+          client
+            .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
+            .put(data, (err, res) => {
+              if (err) {
+                console.log(err);
+              } else {         
+                orgDataArray = [];      
+                console.log("File updated!");
+              }
+            });
         }
-
-        if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && element["DepartmentId"] != null) {
-          depId = element["DepartmentId"];
-        }
-
-        if ( element["DepartmentHead"] != null) {
-          nameDepartmentHead = element["DepartmentHead"]["Navn"];
-        }
-
-        if (typeof element["ParentDepartment"][0] != 'undefined' &&  element["ParentDepartment"][0]["ParentName"][0] != null) {
-          parentName = element["ParentDepartment"][0]["ParentName"][0];
-        }
-
-        writer.write([depId, depName, parentName, nameDepartmentHead]);
-
-      }, this);
-
-      writer.end();
-
+      });
     }
     
     });
 
-    if(is_last){
-      console.log("FINAL REQUEST REACHED READING FILE....");
-    fs.readFile("./orgMap.csv", "utf8", function (err, data) {
-      data = "\ufeff" + data;
-      if (err) {
-        throw err;
-      } else {
-        client
-          .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
-          .put(data, (err, res) => {
-            if (err) {
-              console.log(err);
-            } else {         
-              orgDataArray = [];      
-              console.log("File updated!");
-            }
-          });
-      }
-    });
-  }
 
   }
 }
