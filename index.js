@@ -388,20 +388,15 @@ function shareFile(response, request) {
       }
    
       is_last = request.url.includes("is_last=true");
-
       data = body;
       var dataArray = JSON.parse(data);
       orgDataArray = orgDataArray.concat(dataArray);
 
       if(is_last){
-        var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
+        var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
         writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-
-        console.log(orgDataArray.length);
-        console.log(orgDataArray);
-var count = 0;
-          orgDataArray.forEach(function (element) {
-            console.log(++count);
+     
+          orgDataArray.forEach(function (element) {         
           var parentName = "No Department Parent";
           var depId = "No Department Id";
           var nameDepartmentHead = "No Department Head";
@@ -422,22 +417,24 @@ var count = 0;
           if (typeof element["ParentDepartment"][0] != 'undefined' &&  element["ParentDepartment"][0]["ParentName"][0] != null) {
             parentName = element["ParentDepartment"][0]["ParentName"][0];
           }
-  
+
+          console.log(depId, depName, parentName, nameDepartmentHead);
           writer.write([depId, depName, parentName, nameDepartmentHead]);
   
         }, this);
   
         writer.end();
-        console.log("ENDED writing session...");
+        
       }
 
     });
 
     response.write("200");
     response.end();
+
     request.on('end', function () {
       if(is_last){
-        console.log("FINAL REQUEST REACHED READING FILE....");
+       
       fs.readFile("./orgMap.csv", "utf8", function (err, data) {
         data = "\ufeff" + data;
         if (err) {
