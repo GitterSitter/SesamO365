@@ -13,6 +13,7 @@ var qs = require('querystring');
 var csvWriter = require('csv-write-stream')
 var token = "";
 var userStatusArray = [];
+var orgDataArray = [];
 
 var handle = {};
 handle['/photo'] = updateProfilePicture;
@@ -368,11 +369,11 @@ var download = function (uri, filename, callback) {
 
 
 function shareFile(response, request) {
+
   if (request.method == "POST") {
     var data = "";
     var body = "";
     var is_last = "";
-
 
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
@@ -385,11 +386,9 @@ function shareFile(response, request) {
       if (body.length > 1e6) {
         request.connection.destroy();
       }
-    
+   
       is_last = request.url;
 
-     console.log(is_last.includes("is_last=true"));
-     
     });
 
 
@@ -399,11 +398,14 @@ function shareFile(response, request) {
     request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
-      var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
+      orgDataArray.concat(dataArray);
 
-      // var writer = csvWriter({ headers: ["","","",""] });
+      if(is_last.includes("is_last=true")){
+
+    
+      var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
       writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-      dataArray.forEach(function (element) {
+      orgDataArray.forEach(function (element) {
         var parentName = "No Department Parent";
         var depId = "No Department Id";
         var nameDepartmentHead = "No Department Head";
@@ -430,9 +432,15 @@ function shareFile(response, request) {
       }, this);
 
       writer.end();
+      orgDataArray = [];
+
+    }
+    
+
     });
 
-
+    if(is_last.includes("is_last=true")){
+      
     fs.readFile("./orgMap.csv", "utf8", function (err, data) {
       data = "\ufeff" + data;
       if (err) {
@@ -449,5 +457,7 @@ function shareFile(response, request) {
           });
       }
     });
+  }
+
   }
 }
