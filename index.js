@@ -371,6 +371,8 @@ function shareFile(response, request) {
   if (request.method == "POST") {
     var data = "";
     var body = "";
+    var is_last = "";
+
 
     var client = microsoftGraph.Client.init({
       authProvider: (done) => {
@@ -383,13 +385,12 @@ function shareFile(response, request) {
       if (body.length > 1e6) {
         request.connection.destroy();
       }
-      console.log(body.url);
-      console.log("***********************************************************************");
-     // console.log(body.is_last);
-    //  console.log(request.is_last);
-      console.log(request.url);
-    });
+    
+      is_last = request.url;
 
+     console.log(is_last.includes("is_last=true"));
+     
+    });
 
 
     response.write("200");
@@ -398,7 +399,7 @@ function shareFile(response, request) {
     request.on('end', function () {
       data = body;
       var dataArray = JSON.parse(data);
-      var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] })
+      var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]})
 
       // var writer = csvWriter({ headers: ["","","",""] });
       writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
@@ -427,7 +428,6 @@ function shareFile(response, request) {
         writer.write([depId, depName, parentName, nameDepartmentHead]);
 
       }, this);
-
 
       writer.end();
     });
