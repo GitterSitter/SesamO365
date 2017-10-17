@@ -371,7 +371,6 @@ var download = function (uri, filename, callback) {
 function shareFile(response, request) {
 
   if (request.method == "POST") {
-    var data = "";
     var body = "";
     var is_last = false;
 
@@ -388,14 +387,13 @@ function shareFile(response, request) {
       }
    
       is_last = request.url.includes("is_last=true");
-      data = body;
-      var dataArray = JSON.parse(data);
+      var dataArray = JSON.parse(body);
       orgDataArray = orgDataArray.concat(dataArray);
-
+ 
       if(is_last){
         var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
-        writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-     
+        //writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
+          writer.pipe(fs.createWriteStream('orgMap.csv'));
           orgDataArray.forEach(function (element) {         
           var parentName = "No Department Parent";
           var depId = "No Department Id";
@@ -418,7 +416,6 @@ function shareFile(response, request) {
             parentName = element["ParentDepartment"][0]["ParentName"][0];
           }
 
-          console.log(depId, depName, parentName, nameDepartmentHead);
           writer.write([depId, depName, parentName, nameDepartmentHead]);
   
         }, this);
@@ -452,6 +449,7 @@ function shareFile(response, request) {
             });
         }
       });
+
     }
     
     });
