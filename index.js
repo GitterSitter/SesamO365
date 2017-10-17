@@ -383,11 +383,11 @@ function shareFile(response, request) {
       if (body.length > 1e6) {
         request.connection.destroy();
       }
-      console.log(body);
+      console.log(body.url);
       console.log("***********************************************************************");
-      console.log(body.is_last);
-      console.log(request.is_last);
-      console.log(request);
+     // console.log(body.is_last);
+    //  console.log(request.is_last);
+      console.log(request.url);
     });
 
 
