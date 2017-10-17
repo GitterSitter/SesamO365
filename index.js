@@ -385,11 +385,16 @@ function shareFile(response, request) {
       if (body.length > 1e6) {
         request.connection.destroy();
       }
-   
+  
       is_last = request.url.includes("is_last=true");
       var dataArray = JSON.parse(body);
-      orgDataArray = orgDataArray.concat(dataArray);
- 
+      if(dataArray.length != 0){
+        orgDataArray = orgDataArray.concat(dataArray);
+      }
+
+      is_last = true;
+        console.log(dataArray.length);
+
       if(is_last){
         var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
         //writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
