@@ -14,6 +14,7 @@ var csvWriter = require('csv-write-stream')
 var token = "";
 var userStatusArray = [];
 var orgDataArray = [];
+var checked = false;
 
 var handle = {};
 handle['/photo'] = updateProfilePicture;
@@ -369,7 +370,6 @@ var download = function (uri, filename, callback) {
 
 
 function shareFile(response, request) {
-
   if (request.method == "POST") {
     var body = "";
     var is_last = false;
@@ -392,10 +392,10 @@ function shareFile(response, request) {
         orgDataArray = orgDataArray.concat(dataArray);
       }
 
-      if(is_last){
+      if(is_last && !checked){
           var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
           writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-         // writer.pipe(fs.createWriteStream('orgMap.csv'));
+         //writer.pipe(fs.createWriteStream('orgMap.csv'));
           orgDataArray.forEach(function (element) {         
           var parentName = "No Department Parent";
           var depId = "No Department Id";
@@ -414,15 +414,15 @@ function shareFile(response, request) {
             nameDepartmentHead = element["DepartmentHead"]["Navn"];
           }
   
-          if (typeof element["ParentDepartment"][0] != 'undefined' &&  element["ParentDepartment"][0]["ParentName"][0] != null) {
+          if (typeof element["ParentDepartment"][0] != 'undefined' && element["ParentDepartment"][0]["ParentName"][0] != null) {
             parentName = element["ParentDepartment"][0]["ParentName"][0];
           }
           writer.write([depId, depName, parentName, nameDepartmentHead]);
   
         }, this);
-  
+        checked = true;
         writer.end();  
-        console.log("Ended Writing..")     
+        console.log("Ended Writing..");     
       }
 
     });
