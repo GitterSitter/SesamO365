@@ -433,14 +433,14 @@ function shareFile(response, request) {
     request.on('end', function () {   
       if(is_last){     
         console.log("Started reading..");
-        readOrgFile();
+        readOrgFile(client);
        } 
     });
 
   }
 }
 
- function readOrgFile(){
+ function readOrgFile(client){
   fs.readFile("./orgMap.csv", "utf8", function (err, data) {
     data = "\ufeff" + data;
     if (err) {
