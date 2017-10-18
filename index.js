@@ -421,7 +421,8 @@ function shareFile(response, request) {
   
         }, this);
   
-        writer.end();       
+        writer.end();  
+        console.log("Ended Writing..")     
       }
 
     });
@@ -429,30 +430,32 @@ function shareFile(response, request) {
     response.write("200");
     response.end();
 
-    request.on('end', function () {
-      
+    request.on('end', function () {   
       if(is_last){     
-      fs.readFile("./orgMap.csv", "utf8", function (err, data) {
-        data = "\ufeff" + data;
-        if (err) {
-          console.log( err);
-        } else {
-          client
-            .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
-            .put(data, (err, res) => {
-              if (err) {
-                console.log(err);
-              } else {         
-                orgDataArray = [];      
-                console.log("File updated!");
-              }
-            });
-        }
-      });
-
-    }
-    
+        console.log("Started reading..");
+        readOrgFile();
+       } 
     });
 
   }
+}
+
+ function readOrgFile(){
+  fs.readFile("./orgMap.csv", "utf8", function (err, data) {
+    data = "\ufeff" + data;
+    if (err) {
+      console.log(err);
+    } else {
+      client
+        .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
+        .put(data, (err, res) => {
+          if (err) {
+            console.log(err);
+          } else {         
+            orgDataArray = [];      
+            console.log("File updated!");
+          }
+        });
+    }
+  });
 }
