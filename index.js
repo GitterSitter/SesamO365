@@ -393,9 +393,9 @@ function shareFile(response, request) {
       }
 
       if(is_last){
-        var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
-        //writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-          writer.pipe(fs.createWriteStream('orgMap.csv'));
+          var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
+          writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
+         // writer.pipe(fs.createWriteStream('orgMap.csv'));
           orgDataArray.forEach(function (element) {         
           var parentName = "No Department Parent";
           var depId = "No Department Id";
@@ -423,6 +423,7 @@ function shareFile(response, request) {
   
         writer.end();       
       }
+
     });
 
     response.write("200");
@@ -434,7 +435,7 @@ function shareFile(response, request) {
       fs.readFile("./orgMap.csv", "utf8", function (err, data) {
         data = "\ufeff" + data;
         if (err) {
-          throw err;
+          console.log( err);
         } else {
           client
             .api('groups/2fe68adf-397c-4c85-90bb-4fd64544680d/drive/root/children/orgMap.csv/content')
