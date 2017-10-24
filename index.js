@@ -388,6 +388,11 @@ function shareFile(response, request) {
       var dataArray = JSON.parse(body);
       if(dataArray.length != 0){
         orgDataArray = orgDataArray.concat(dataArray);
+
+        orgDataArray = orgDataArray.filter(function(item, index, inputArray ) {
+          return inputArray.indexOf(item) == index;
+   });
+
       }
 
       if(is_last && !checked){
