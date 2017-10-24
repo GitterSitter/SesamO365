@@ -401,9 +401,13 @@ function shareFile(response, request) {
            writer = csvWriter({headers: [" ", " ", " ", " "] });
         }
         writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-        orgDataArray = orgDataArray.filter(function (item, index, inputArray) {
-          return inputArray.indexOf(item) == index;
-        });
+
+
+        // orgDataArray = orgDataArray.filter(function (item, index, inputArray) {
+        //   return inputArray.indexOf(item) == index;
+        // });
+
+        orgDataArray = deleteDuplicates(orgDataArray);
   
         orgDataArray.forEach(function (element) {
           var parentName = "No Department Parent";
@@ -446,6 +450,18 @@ function shareFile(response, request) {
     });
   }
 }
+
+function deleteDuplicates(arr) {
+	var hashTable = {};
+
+	return arr.filter(function (el) {
+		var key = JSON.stringify(el);
+		var match = Boolean(hashTable[key]);
+
+		return (match ? false : hashTable[key] = true);
+	});
+}
+
 
 function readOrgFile(client) {
   fs.readFile("./orgMap.csv", "utf8", function (err, data) {
