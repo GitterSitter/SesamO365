@@ -407,6 +407,7 @@ function shareFile(response, request) {
         //   return inputArray.indexOf(item) == index;
         // });
 
+
         orgDataArray = deleteDuplicates(orgDataArray);
   
         orgDataArray.forEach(function (element) {
@@ -451,9 +452,14 @@ function shareFile(response, request) {
   }
 }
 
+
+function uniqInstances(a) {
+  return Array.from(new Set(a));
+}
+
+
 function deleteDuplicates(arr) {
 	var hashTable = {};
-
 	return arr.filter(function (el) {
 		var key = JSON.stringify(el);
 		var match = Boolean(hashTable[key]);
