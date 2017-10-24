@@ -208,9 +208,9 @@ function users(response, request) {
     //If you want a different set of properties, you can request them using the $select query parameter. E.g https://graph.microsoft.com/v1.0/users/e97f274a-2a86-4280-997d-8ee4d2c52078?$select=aboutMe
     //Når AD brukes er det ikke mulig å gjøre endringer! Man kan kun gjøre GET requests. Ellers må man oppdatere direkte i AD.
     //Azure Ad Graph Api kan brukes for å gjøre endringer på brukere, grupper og kontakter i AD.
- // On premise AD hindrer updates
+    // On premise AD hindrer updates
 
-    var userId = request.data;  
+    var userId = request.data;
     client.api("/users/" + userId + "/displayName")
       .patch(
       { "value": "Test" },
@@ -383,65 +383,66 @@ function shareFile(response, request) {
       if (body.length > 1e6) {
         request.connection.destroy();
       }
-  
+
       is_last = request.url.includes("is_last=true");
       var dataArray = JSON.parse(body);
-      if(dataArray.length != 0){
+      if (dataArray.length != 0) {
         orgDataArray = orgDataArray.concat(dataArray);
-
-        orgDataArray = orgDataArray.filter(function(item, index, inputArray ) {
-          return inputArray.indexOf(item) == index;
-   });
 
       }
 
-      if(is_last && !checked){
-          var writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"]});
-          writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-         //writer.pipe(fs.createWriteStream('orgMap.csv'));
-          orgDataArray.forEach(function (element) {         
+      orgDataArray = orgDataArray.filter(function (item, index, inputArray) {
+        return inputArray.indexOf(item) == index;
+      });
+
+
+      if (is_last && !checked) {
+        var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] });
+        writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
+        //writer.pipe(fs.createWriteStream('orgMap.csv'));
+        orgDataArray.forEach(function (element) {
           var parentName = "No Department Parent";
           var depId = "No Department Id";
           var nameDepartmentHead = "No Department Head";
           var depName = "No Department Name";
-       
+
           if (element["DepartmentName"] != null) {
             depName = element["DepartmentName"];
           }
-  
+
           if (element["DepartmentId"] != "_Scurrenttime-department:departmentref" && element["DepartmentId"] != null) {
             depId = element["DepartmentId"];
           }
-  
-          if ( element["DepartmentHead"] != null) {
+
+          if (element["DepartmentHead"] != null) {
             nameDepartmentHead = element["DepartmentHead"]["Navn"];
           }
-  
+
           if (typeof element["ParentDepartment"][0] != 'undefined' && element["ParentDepartment"][0]["ParentName"][0] != null) {
             parentName = element["ParentDepartment"][0]["ParentName"][0];
           }
           writer.write([depId, depName, parentName, nameDepartmentHead]);
-  
+
         }, this);
         checked = true;
-        writer.end();  
-        console.log("Ended Writing..");     
+        writer.end();
+        console.log("Ended Writing..");
       }
 
     });
 
     response.write("200");
     response.end();
-    request.on('end', function () {   
-      if(is_last){     
+    request.on('end', function () {
+      if (is_last) {
         console.log("Started reading..");
         readOrgFile(client);
-       } 
+      }
     });
   }
 }
 
- function readOrgFile(client){
+function readOrgFile(client) {
   fs.readFile("./orgMap.csv", "utf8", function (err, data) {
     data = "\ufeff" + data;
     if (err) {
@@ -452,8 +453,8 @@ function shareFile(response, request) {
         .put(data, (err, res) => {
           if (err) {
             console.log(err);
-          } else {         
-            orgDataArray = [];      
+          } else {
+            orgDataArray = [];
             console.log("File updated!");
           }
         });
