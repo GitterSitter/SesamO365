@@ -391,15 +391,16 @@ function shareFile(response, request) {
 
       }
 
-      orgDataArray = orgDataArray.filter(function (item, index, inputArray) {
-        return inputArray.indexOf(item) == index;
-      });
-
+    
 
       if (is_last && !checked) {
         var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] });
         writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
         //writer.pipe(fs.createWriteStream('orgMap.csv'));
+        orgDataArray = orgDataArray.filter(function (item, index, inputArray) {
+          return inputArray.indexOf(item) == index;
+        });
+  
         orgDataArray.forEach(function (element) {
           var parentName = "No Department Parent";
           var depId = "No Department Id";
