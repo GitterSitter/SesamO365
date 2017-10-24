@@ -392,11 +392,15 @@ function shareFile(response, request) {
       }
 
     
+      if (is_last) {
 
-      if (is_last && !checked) {
-        var writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] });
+        var writer;
+        if(!checked){
+           writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] });
+        }else {
+           writer = csvWriter({headers: [" ", " ", " ", " "] });
+        }
         writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
-        //writer.pipe(fs.createWriteStream('orgMap.csv'));
         orgDataArray = orgDataArray.filter(function (item, index, inputArray) {
           return inputArray.indexOf(item) == index;
         });
