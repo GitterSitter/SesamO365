@@ -22,10 +22,13 @@ handle['/users'] = users;
 handle['/groups'] = groups;
 handle['/file'] = shareFile;
 handle['/status'] = userStatus;
+handle['/industry'] = updateIndustryList;
+
+
 
 server.start(router.route, handle);
 
-//Requesting a new token every second hour as the old one expires
+//Requesting a new token every hour as the old one expires
 function refreshToken() {
   getNewToken();
 }
@@ -40,7 +43,7 @@ auth.getAccessToken().then(function (token) {
   saveToken(token)
     .then(function (tok) {
     }, function (error) {
-      console.error('>>> Error getting users: ' + error);
+      console.error('>>> Error getting access token: ' + error);
     });
 }, function (error) {
   console.error('>>> Error getting access token: ' + error);
@@ -57,6 +60,48 @@ function getNewToken() {
   }, function (error) {
     console.error('>>> Error getting access token: ' + error);
   });
+}
+
+function updateIndustryList(response, request) {   
+  if (request.method === "POST") {
+    var body = [];
+
+    var client = microsoftGraph.Client.init({
+      authProvider: (done) => {
+        done(null, token);
+      }
+    });
+
+    request.on('data', function (input) {
+      body += input;
+      if (body.length > 1e6) {
+        request.connection.destroy();
+      }
+
+
+      var userArray = JSON.parse(body);
+      console.log(userArray);
+      userArray.forEach(element => {
+        var instance = {
+          "fields": {
+            "Title": element["values"]["no"],
+            "ContentType": "Item",
+            "Edit": ""
+          }
+        }
+        client
+          .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
+          .post(instance, (err, res) => {
+            if (err) {
+              console.log(err);
+            } else {
+              console.log("File updated!");
+            }
+          });
+      });
+
+    });
+  }
 }
 
 
