@@ -78,9 +78,7 @@ function updateIndustryList(response, request) {
         request.connection.destroy();
       }
 
-
       var userArray = JSON.parse(body);
-      console.log(userArray);
       userArray.forEach(element => {
         var instance = {
           "fields": {
@@ -99,7 +97,6 @@ function updateIndustryList(response, request) {
             }
           });
       });
-
     });
   }
 }
