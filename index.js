@@ -24,8 +24,6 @@ handle['/file'] = shareFile;
 handle['/status'] = userStatus;
 handle['/industry'] = updateIndustryList;
 
-
-
 server.start(router.route, handle);
 
 //Requesting a new token every hour as the old one expires
@@ -63,15 +61,15 @@ function getNewToken() {
 }
 
 function updateIndustryList(response, request) {   
+ 
+  var client = microsoftGraph.Client.init({
+    authProvider: (done) => {
+      done(null, token);
+    }
+  });
+
   if (request.method === "POST") {
     var body = [];
-
-    var client = microsoftGraph.Client.init({
-      authProvider: (done) => {
-        done(null, token);
-      }
-    });
-
     request.on('data', function (input) {
       body += input;
       if (body.length > 1e6) {
@@ -80,11 +78,14 @@ function updateIndustryList(response, request) {
 
       var userArray = JSON.parse(body);
       userArray.forEach(element => {
+        console.log(element["id"]);
+
         var instance = {
           "fields": {
             "Title": element["values"]["no"],
             "ContentType": "Item",
-            "Edit": ""
+            "Edit": "",
+            "id" : element["_id"]
           }
         }
         client
@@ -93,10 +94,27 @@ function updateIndustryList(response, request) {
             if (err) {
               console.log(err);
             } else {
-              console.log("File updated!");
+              console.log("List updated!");
             }
           });
       });
+    });
+   
+  } else if (request.method === "GET"){
+    var instances = [];
+    client
+    .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items?expand=fields")
+    .get((err, res) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res["value"].forEach(function (element){
+          instances.push(element["fields"]);
+          // console.log(element["fields"]);
+        });       
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify(instances));
+      }
     });
   }
 }
