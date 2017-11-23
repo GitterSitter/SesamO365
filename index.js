@@ -97,8 +97,8 @@ async function updateIndustryList(response, request) {
          
           if (instance["fields"]["Title"] === element["values"]["no"]) {
             skip.push(element);
-            console.log(instance["Title"] + " === " + element["values"]["no"]);
-            console.log("Skipping " + instance["Title"]);
+            console.log(instance["fields"]["Title"] + " === " + element["values"]["no"]);
+            console.log("Skipping " + instance["fields"]["Title"]);
           }
 
         });
@@ -112,6 +112,8 @@ async function updateIndustryList(response, request) {
 
 
       console.log(userArray.length + " userArray after");
+
+      
       userArray.forEach(element => {
         var instance = {
           "fields": {
