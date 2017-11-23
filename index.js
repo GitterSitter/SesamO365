@@ -80,7 +80,7 @@ async function updateIndustryList(response, request) {
     await getIndustries().then(data => {
       existingInstances = data;
 
-      console.log(existingInstances.length + " existing intems");
+      console.log(existingInstances.length + " existing items");
 
 
      request.on('data', function (input) {
@@ -89,32 +89,35 @@ async function updateIndustryList(response, request) {
         request.connection.destroy();
       }
 
+      if(body.length === 0){
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify("No data"));
+        return;
+      }
+
       var userArray = JSON.parse(body);
 
+      console.log(userArray.length + " userArray before");
+
       userArray.forEach(element => {
-        //console.log(element["id"]);
-        existingInstances.forEach(instance => {
-         
+        existingInstances.forEach(instance => {       
           if (instance["fields"]["Title"] === element["values"]["no"]) {
-            skip.push(element);
-            console.log(instance["fields"]["Title"] + " === " + element["values"]["no"]);
+            //skip.push(element);
+            userArray.splice(element, 0);
             console.log("Skipping " + instance["fields"]["Title"]);
           }
-
         });
       });
 
 
-      console.log(userArray.length + " userArray before");
-      console.log(skip.length + " items skipped!");
-      userArray = userArray.filter(function (item, index, skip) {
-        return skip.indexOf(item) == index;
-      });
+  
+     // console.log(skip.length + " items skipped!");
 
+      // userArray = userArray.filter(function (item, index, skip) {
+      //   return skip.indexOf(item) == index;
+      // });
 
       console.log(userArray.length + " userArray after");
-
-
       userArray.forEach(element => {
         var instance = {
           "fields": {
