@@ -106,14 +106,15 @@ async function updateIndustryList(response, request) {
 
 
       console.log(userArray.length + " userArray before");
-      userArray = userArray.filter(function (item, index, existingInstances) {
-        return existingInstances.indexOf(item) == index;
+      console.log(skip.length + " items skipped!");
+      userArray = userArray.filter(function (item, index, skip) {
+        return skip.indexOf(item) == index;
       });
 
 
       console.log(userArray.length + " userArray after");
 
-      
+
       userArray.forEach(element => {
         var instance = {
           "fields": {
