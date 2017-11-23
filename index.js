@@ -99,11 +99,11 @@ async function updateIndustryList(response, request) {
 
       console.log(userArray.length + " userArray before");
 
-      userArray.forEach(element => {
+      userArray.forEach(function(item, index, object) {
         existingInstances.forEach(instance => {       
-          if (instance["fields"]["Title"] === element["values"]["no"]) {
+          if (instance["fields"]["Title"] === item["values"]["no"]) {
             //skip.push(element);
-            userArray.splice(element, 0);
+            object.splice(index, 1);
             console.log("Skipping " + instance["fields"]["Title"]);
           }
         });
