@@ -100,7 +100,7 @@ async function updateIndustryList(response, request) {
               console.log(x);
           //    userArray.forEach(item => {
             for(var i = 0; i < existingInstances.length; i++ ){
-              if (existingInstances[i]["fields"]["Title"] === userArray["values"]["no"]) {
+              if (existingInstances[i]["fields"]["Title"] === userArray[x]["values"]["no"]) {
                 newInstances.splice(userArray[x], 1);
                 console.log("Skipping " +  userArray[x]["values"]["no"]);
               }
