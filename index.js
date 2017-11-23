@@ -60,8 +60,10 @@ function getNewToken() {
   });
 }
 
-function updateIndustryList(response, request) {   
- 
+
+
+async function updateIndustryList(response, request) {
+
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
@@ -69,7 +71,15 @@ function updateIndustryList(response, request) {
   });
 
   if (request.method === "POST") {
+
+    var existingInstances = [];
+    var skip = [];
     var body = [];
+
+    await getIndustries().then(data => {
+      existingInstances = data;
+    });
+
     request.on('data', function (input) {
       body += input;
       if (body.length > 1e6) {
@@ -77,17 +87,31 @@ function updateIndustryList(response, request) {
       }
 
       var userArray = JSON.parse(body);
+      
       userArray.forEach(element => {
-        console.log(element["id"]);
+        //console.log(element["id"]);
+        existingInstances.forEach(instance => {
+          if (instance["Title"] === element["values"]["no"]) {
+            skip.push(element);
+            console.log(instance["Title"] + " === " + element["values"]["no"]);
+          }
+        });
+      });
 
+      userArray = userArray.filter(function (item, index, existingInstances) {
+          return existingInstances.indexOf(item) == index;
+        });
+
+      userArray.forEach(element => {
         var instance = {
           "fields": {
             "Title": element["values"]["no"],
             "ContentType": "Item",
-            "Edit": "",
-            "id" : element["_id"]
+            "Edit": ""
           }
         }
+
+        console.log(instance);
         client
           .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
           .post(instance, (err, res) => {
@@ -99,29 +123,58 @@ function updateIndustryList(response, request) {
           });
       });
     });
-   
-  } else if (request.method === "GET"){
-    var instances = [];
-    client
-    .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items?expand=fields")
-    .get((err, res) => {
-      if (err) {
-        console.log(err);
-      } else {
-        res["value"].forEach(function (element){
-          instances.push(element["fields"]);
-          // console.log(element["fields"]);
-        });       
-        response.writeHead(200, { "Content-Type": "application/json" });
-        response.end(JSON.stringify(instances));
-      }
+
+  } else if (request.method === "GET") {
+
+    await getIndustries().then(data => {
+      response.writeHead(200, { "Content-Type": "application/json" });
+      response.end(JSON.stringify(data));
+
     });
   }
 }
 
 
-function userStatus(response, request) {
+async function getIndustries() {
+  var client = microsoftGraph.Client.init({
+    authProvider: (done) => {
+      done(null, token);
+    }
+  });
 
+  var instances = [];
+
+  client
+    .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items?expand=fields")
+    .get((err, res) => {
+      if (err) {
+        console.log(err);
+      } else {
+        res["value"].forEach(function (element) {
+
+          var instance = {
+            "fields": element["fields"]
+            //{
+            // "Title": element["values"]["no"],
+            // "ContentType": "Item",
+            // "Edit": ""           
+            //}
+          }
+          instances.push(instance);
+        });
+      }
+    });
+
+  return new Promise((resolve, reject) => {
+    setTimeout(() => {
+      resolve(instances);
+    }, 3000);
+  });
+}
+
+
+
+function userStatus(response, request) {
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
@@ -451,14 +504,14 @@ function shareFile(response, request) {
 
       }
 
-    
+
       if (is_last) {
 
         var writer;
-        if(!checked){
-           writer = csvWriter({headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] });
-        }else {
-           writer = csvWriter({headers: [" ", " ", " ", " "] });
+        if (!checked) {
+          writer = csvWriter({ headers: ["DepartmentId", "DepartmentName", "ParentDepartment", "Navn"] });
+        } else {
+          writer = csvWriter({ headers: [" ", " ", " ", " "] });
         }
         writer.pipe(fs.createWriteStream('orgMap.csv', { flags: 'a' }));
 
@@ -469,7 +522,7 @@ function shareFile(response, request) {
 
 
         orgDataArray = deleteDuplicates(orgDataArray);
-  
+
         orgDataArray.forEach(function (element) {
           var parentName = "No Department Parent";
           var depId = "No Department Id";
@@ -519,13 +572,13 @@ function uniqInstances(a) {
 
 
 function deleteDuplicates(arr) {
-	var hashTable = {};
-	return arr.filter(function (el) {
-		var key = JSON.stringify(el);
-		var match = Boolean(hashTable[key]);
+  var hashTable = {};
+  return arr.filter(function (el) {
+    var key = JSON.stringify(el);
+    var match = Boolean(hashTable[key]);
 
-		return (match ? false : hashTable[key] = true);
-	});
+    return (match ? false : hashTable[key] = true);
+  });
 }
 
 

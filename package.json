@@ -9,9 +9,11 @@
   },
   "dependencies": {
     "@microsoft/microsoft-graph-client": "^0.4.0",
+    "await": "^0.2.6",
     "csv-write-stream": "^2.0.0",
     "es6-promise": "^4.1.0",
     "filereader": "^0.10.3",
+    "node": "^9.2.0",
     "q": "^1.5.0",
     "qs": "^6.5.0",
     "request": "^2.81.0",
