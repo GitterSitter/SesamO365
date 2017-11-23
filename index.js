@@ -73,73 +73,74 @@ async function updateIndustryList(response, request) {
   if (request.method === "POST") {
 
     var existingInstances = [];
-    var skip = [];
     var body = [];
-
+    var newInstances = [];
 
     await getIndustries().then(data => {
       existingInstances = data;
 
       console.log(existingInstances.length + " existing items");
 
-
-     request.on('data', function (input) {
-      body += input;
-      if (body.length > 1e6) {
-        request.connection.destroy();
-      }
-
-      if(body.length === 0){
-        response.writeHead(200, { "Content-Type": "application/json" });
-        response.end(JSON.stringify("No data"));
-        return;
-      }
-
-      var userArray = JSON.parse(body);
-
-      console.log(userArray.length + " userArray before");
-
-      userArray.forEach(function(item, index, object) {
-        existingInstances.forEach(instance => {       
-          if (instance["fields"]["Title"] === item["values"]["no"]) {
-        //    skip.push(item);
-          //  userArray.splice(index, 1);
-          existingInstances.splice(instance, 1);
-            console.log("Skipping " + instance["fields"]["Title"]);
-          }
-
-        });
-      });
-
-   //  console.log(skip.length + " items skipped!");
-      // userArray = userArray.filter(function (item, index, skip) {
-      //   return skip.indexOf(item) == index;
-      // });
-
-      console.log(userArray.length + " userArray after");
-      console.log(existingInstances.length + " array of instances after");
-      existingInstances.forEach(element => {
-        var instance = {
-          "fields": {
-            "Title": element["values"]["no"],
-            "ContentType": "Item",
-            "Edit": ""
-          }
+      request.on('data', function (input) {
+        body += input;
+        if (body.length > 1e6) {
+          request.connection.destroy();
         }
-        client
-          .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
-          .post(instance, (err, res) => {
-            if (err) {
-              console.log(err);
-            } else {
-              console.log(instance["fields"]["Title"] + " added!");
-            }
-          });
-      });
 
-      response.writeHead(200, { "Content-Type": "application/json" });
-      response.end(JSON.stringify("Instances inserted: " + userArray.length));
-    });
+        if (body.length === 0) {
+          response.writeHead(200, { "Content-Type": "application/json" });
+          response.end(JSON.stringify("No data"));
+          return;
+        }
+
+        var userArray = JSON.parse(body);
+        newInstances = userArray;
+
+
+        userArray.forEach(function (item, index, object) {
+          existingInstances.forEach(instance => {
+            if (instance["fields"]["Title"] === item["values"]["no"]) {
+              newInstances.splice(instance, 1);
+              console.log("Skipping " + instance["fields"]["Title"]);
+            }
+
+          });
+        });
+
+        //  console.log(skip.length + " items skipped!");
+        // userArray = userArray.filter(function (item, index, skip) {
+        //   return skip.indexOf(item) == index;
+        // });
+
+        console.log(userArray.length + " userArray after");
+        console.log(existingInstances.length + " array of instances after");
+
+      if(existingInstances === 0){
+        newInstances = userArray;
+      }
+
+       newInstances.forEach(element => {
+          var instance = {
+            "fields": {
+              "Title": element["values"]["no"],
+              "ContentType": "Item",
+              "Edit": ""
+            }
+          }
+          client
+            .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
+            .post(instance, (err, res) => {
+              if (err) {
+                console.log(err);
+              } else {
+                console.log(instance["fields"]["Title"] + " added!");
+              }
+            });
+        });
+
+        response.writeHead(200, { "Content-Type": "application/json" });
+        response.end(JSON.stringify("Instances inserted: " + userArray.length));
+      });
     });
 
   } else if (request.method === "GET") {
