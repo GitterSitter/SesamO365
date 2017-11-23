@@ -97,20 +97,15 @@ async function updateIndustryList(response, request) {
         newInstances = userArray;
 
 
-        userArray.forEach(function (item, index, object) {
           existingInstances.forEach(instance => {
-            if (instance["fields"]["Title"] === item["values"]["no"]) {
-              newInstances.splice(instance, 1);
-              console.log("Skipping " + instance["fields"]["Title"]);
-            }
 
-          });
+              userArray.forEach(function (item, index, object) {
+              if (instance["fields"]["Title"] === item["values"]["no"]) {
+                newInstances.splice(instance, 1);
+                console.log("Skipping " + instance["fields"]["Title"]);
+              }
+            });
         });
-
-        //  console.log(skip.length + " items skipped!");
-        // userArray = userArray.filter(function (item, index, skip) {
-        //   return skip.indexOf(item) == index;
-        // });
 
         console.log(userArray.length + " userArray after");
         console.log(existingInstances.length + " array of instances after");
@@ -137,7 +132,6 @@ async function updateIndustryList(response, request) {
               }
             });
         });
-
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify("Instances inserted: " + userArray.length));
       });
