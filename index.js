@@ -88,14 +88,19 @@ async function updateIndustryList(response, request) {
 
       var userArray = JSON.parse(body);
 
+
+
       userArray.forEach(element => {
         //console.log(element["id"]);
         existingInstances.forEach(instance => {
+         
           if (instance["Title"] === element["values"]["no"]) {
             skip.push(element);
             console.log(instance["Title"] + " === " + element["values"]["no"]);
             console.log("Skipping " + instance["Title"]);
           }
+
+            console.log(instance["Title"] + " <===> " + element["values"]["no"]);
         });
       });
 
@@ -119,7 +124,7 @@ async function updateIndustryList(response, request) {
             if (err) {
               console.log(err);
             } else {
-              console.log("Added " + instance["Title"]);
+              console.log(instance["Title"] + " added!");
             }
           });
       });
