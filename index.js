@@ -80,6 +80,9 @@ async function updateIndustryList(response, request) {
     await getIndustries().then(data => {
       existingInstances = data;
 
+      console.log(existingInstances.length + " existing intems");
+
+
      request.on('data', function (input) {
       body += input;
       if (body.length > 1e6) {
@@ -98,14 +101,17 @@ async function updateIndustryList(response, request) {
             console.log("Skipping " + instance["Title"]);
           }
 
-            console.log(instance["Title"] + " <===> " + element["values"]["no"]);
         });
       });
 
+
+      console.log(userArray.length + " userArray before");
       userArray = userArray.filter(function (item, index, existingInstances) {
         return existingInstances.indexOf(item) == index;
       });
 
+
+      console.log(userArray.length + " userArray after");
       userArray.forEach(element => {
         var instance = {
           "fields": {
