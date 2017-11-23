@@ -123,6 +123,10 @@ async function updateIndustryList(response, request) {
             }
           });
       });
+
+      response.writeHead(200, { "Content-Type": "application/json" });
+      response.end(JSON.stringify("Instances inserted: " + userArray.length));
+
     });
 
   } else if (request.method === "GET") {
