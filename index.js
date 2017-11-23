@@ -87,7 +87,7 @@ async function updateIndustryList(response, request) {
       }
 
       var userArray = JSON.parse(body);
-      
+
       userArray.forEach(element => {
         //console.log(element["id"]);
         existingInstances.forEach(instance => {
@@ -98,6 +98,7 @@ async function updateIndustryList(response, request) {
         });
       });
 
+      
       userArray = userArray.filter(function (item, index, existingInstances) {
           return existingInstances.indexOf(item) == index;
         });
