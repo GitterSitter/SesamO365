@@ -15,7 +15,7 @@ var token = "";
 var userStatusArray = [];
 var orgDataArray = [];
 var checked = false;
-
+var lodash =  require('lodash');
 var handle = {};
 handle['/photo'] = updateProfilePicture;
 handle['/users'] = users;
@@ -96,19 +96,31 @@ async function updateIndustryList(response, request) {
         var userArray = JSON.parse(body);
         newInstances = userArray;
 
+        //   existingInstances.forEach(instance => {
+        //       userArray.forEach(item => {
 
-          existingInstances.forEach(instance => {
-              userArray.forEach(function (item, index, object) {
+        //       if (instance["fields"]["Title"] === item["values"]["no"]) {
+        //         newInstances.splice(item, 1);
+        //         console.log("Skipping " +  item["values"]["no"]);
+        //       }
+        //       console.log(instance["fields"]["Title"] + " === " +  item["values"]["no"]);
+        //     });
+        // });
 
-              if (instance["fields"]["Title"] === item["values"]["no"]) {
-                newInstances.splice(item, 1);
-                console.log("Skipping " +  item["values"]["no"]);
-              }
-            });
+      //   _.forEach(existingInstances, function(item1) {
+      //     item1.fields.Title = _.find(userArray, {"Title": item1.id});
+      // });
+
+      existingInstances.forEach(function(item1) {
+        item1.fields.Title = userArray.find(function (item2) {
+          if(item2.values.no === item1.fields.Title) {
+            newInstances.splice(item2, 1);
+            console.log("Removing: " + item2);
+          }
         });
-
-        console.log(userArray.length + " userArray after");
-        console.log(existingInstances.length + " array of instances after");
+    });
+    
+        console.log(newInstances.length + " new items to insert");
 
       if(existingInstances === 0){
         newInstances = userArray;
