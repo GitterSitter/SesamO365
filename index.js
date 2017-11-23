@@ -102,7 +102,7 @@ async function updateIndustryList(response, request) {
       userArray.forEach(function(item, index, object) {
         existingInstances.forEach(instance => {       
           if (instance["fields"]["Title"] === item["values"]["no"]) {
-            skip.push(element);
+        //    skip.push(item);
           //  userArray.splice(index, 1);
           existingInstances.splice(instance, 1);
             console.log("Skipping " + instance["fields"]["Title"]);
@@ -111,7 +111,7 @@ async function updateIndustryList(response, request) {
         });
       });
 
-     console.log(skip.length + " items skipped!");
+   //  console.log(skip.length + " items skipped!");
       // userArray = userArray.filter(function (item, index, skip) {
       //   return skip.indexOf(item) == index;
       // });
