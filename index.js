@@ -88,12 +88,11 @@ async function updateIndustryList(response, request) {
 
       var userArray = JSON.parse(body);
 
-
       userArray.forEach(element => {
         //console.log(element["id"]);
         existingInstances.forEach(instance => {
          
-          if (instance["Title"] === element["values"]["no"]) {
+          if (instance["fields"]["Title"] === element["values"]["no"]) {
             skip.push(element);
             console.log(instance["Title"] + " === " + element["values"]["no"]);
             console.log("Skipping " + instance["Title"]);
@@ -102,7 +101,6 @@ async function updateIndustryList(response, request) {
             console.log(instance["Title"] + " <===> " + element["values"]["no"]);
         });
       });
-
 
       userArray = userArray.filter(function (item, index, existingInstances) {
         return existingInstances.indexOf(item) == index;
@@ -116,14 +114,13 @@ async function updateIndustryList(response, request) {
             "Edit": ""
           }
         }
-
         client
           .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
           .post(instance, (err, res) => {
             if (err) {
               console.log(err);
             } else {
-              console.log(instance["Title"] + " added!");
+              console.log(instance["fields"]["Title"] + " added!");
             }
           });
       });
