@@ -113,7 +113,7 @@ async function updateIndustryList(response, request) {
 
       existingInstances.forEach(function(item1) {
         item1.fields.Title = userArray.find(function (item2) {
-          if(item2.values.no === item1.fields.Title) {
+          if(item2["values"]["no"] === item1.fields.Title) {
             newInstances.splice(item2, 1);
             console.log("Removing: " + item2);
           }
