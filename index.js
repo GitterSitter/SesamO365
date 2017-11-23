@@ -79,8 +79,6 @@ async function updateIndustryList(response, request) {
     await getIndustries().then(data => {
       existingInstances = data;
 
-      console.log(existingInstances.length + " existing items");
-
       request.on('data', function (input) {
         body += input;
         if (body.length > 1e6) {
@@ -93,32 +91,33 @@ async function updateIndustryList(response, request) {
           return;
         }
 
+        console.log(existingInstances.length + " existing items");
         var userArray = JSON.parse(body);
         newInstances = userArray;
 
-        //   existingInstances.forEach(instance => {
-        //       userArray.forEach(item => {
+      for(var i = 0; i < existingInstances.length; i++ ){
+       //   existingInstances.forEach(instance => {
+              console.log(i);
+              userArray.forEach(item => {
 
-        //       if (instance["fields"]["Title"] === item["values"]["no"]) {
-        //         newInstances.splice(item, 1);
-        //         console.log("Skipping " +  item["values"]["no"]);
-        //       }
-        //       console.log(instance["fields"]["Title"] + " === " +  item["values"]["no"]);
-        //     });
-        // });
-
-      //   _.forEach(existingInstances, function(item1) {
-      //     item1.fields.Title = _.find(userArray, {"Title": item1.id});
-      // });
-
-      existingInstances.forEach(function(item1) {
-        item1.fields.Title = userArray.find(function (item2) {
-          if(item2["values"]["no"] === item1.fields.Title) {
-            newInstances.splice(item2, 1);
-            console.log("Removing: " + item2);
-          }
+              if (instance[i]["fields"]["Title"] === item["values"]["no"]) {
+                newInstances.splice(item, 1);
+                console.log("Skipping " +  item["values"]["no"]);
+              }
+              console.log(instance[i]["fields"]["Title"] + " === " +  item["values"]["no"]);
+            });
         });
-    });
+
+
+
+    //   existingInstances.forEach(function(item1) {
+    //     item1.fields.Title = userArray.find(function (item2) {
+    //       if(item2["values"]["no"] === item1.fields.Title) {
+    //         newInstances.splice(item2, 1);
+    //         console.log("Removing: " + item2);
+    //       }
+    //     });
+    // });
     
      
         console.log(newInstances.length + " new items to insert");
