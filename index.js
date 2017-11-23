@@ -120,6 +120,7 @@ async function updateIndustryList(response, request) {
         });
     });
     
+     
         console.log(newInstances.length + " new items to insert");
 
       if(existingInstances === 0){
