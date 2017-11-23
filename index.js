@@ -76,18 +76,17 @@ async function updateIndustryList(response, request) {
     var skip = [];
     var body = [];
 
+
     await getIndustries().then(data => {
       existingInstances = data;
-    });
 
-    request.on('data', function (input) {
+     request.on('data', function (input) {
       body += input;
       if (body.length > 1e6) {
         request.connection.destroy();
       }
 
       var userArray = JSON.parse(body);
-
 
 
       userArray.forEach(element => {
@@ -131,7 +130,7 @@ async function updateIndustryList(response, request) {
 
       response.writeHead(200, { "Content-Type": "application/json" });
       response.end(JSON.stringify("Instances inserted: " + userArray.length));
-
+    });
     });
 
   } else if (request.method === "GET") {
