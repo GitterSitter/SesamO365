@@ -94,14 +94,15 @@ async function updateIndustryList(response, request) {
           if (instance["Title"] === element["values"]["no"]) {
             skip.push(element);
             console.log(instance["Title"] + " === " + element["values"]["no"]);
+            console.log("Skipping " + instance["Title"]);
           }
         });
       });
 
-      
+
       userArray = userArray.filter(function (item, index, existingInstances) {
-          return existingInstances.indexOf(item) == index;
-        });
+        return existingInstances.indexOf(item) == index;
+      });
 
       userArray.forEach(element => {
         var instance = {
@@ -112,31 +113,30 @@ async function updateIndustryList(response, request) {
           }
         }
 
-        console.log(instance);
         client
           .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
           .post(instance, (err, res) => {
             if (err) {
               console.log(err);
             } else {
-              console.log("List updated!");
+              console.log("Added " + instance["Title"]);
             }
           });
       });
     });
 
   } else if (request.method === "GET") {
-
     await getIndustries().then(data => {
       response.writeHead(200, { "Content-Type": "application/json" });
       response.end(JSON.stringify(data));
-
+    }).catch(error => {
+      console.log(error);
     });
   }
 }
 
 
-async function getIndustries() {
+function getIndustries() {
   var client = microsoftGraph.Client.init({
     authProvider: (done) => {
       done(null, token);
@@ -144,7 +144,6 @@ async function getIndustries() {
   });
 
   var instances = [];
-
   client
     .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items?expand=fields")
     .get((err, res) => {
@@ -152,14 +151,8 @@ async function getIndustries() {
         console.log(err);
       } else {
         res["value"].forEach(function (element) {
-
           var instance = {
             "fields": element["fields"]
-            //{
-            // "Title": element["values"]["no"],
-            // "ContentType": "Item",
-            // "Edit": ""           
-            //}
           }
           instances.push(instance);
         });
