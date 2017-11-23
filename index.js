@@ -106,7 +106,8 @@ async function updateIndustryList(response, request) {
               }
               console.log(instance[i]["fields"]["Title"] + " === " +  item["values"]["no"]);
             });
-        });
+          }
+        // });
 
 
         console.log(newInstances.length + " new items to insert");
