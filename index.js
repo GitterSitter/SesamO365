@@ -120,7 +120,7 @@ async function updateIndustryList(response, request) {
           }
         }
 
-        
+
         console.log(Totalcount + " total count");
         console.log(count + " equals found");
         console.log(newInstances.length + " new items to insert");
@@ -134,8 +134,8 @@ async function updateIndustryList(response, request) {
             "fields": {
               "Title": element["values"]["no"],
               "ContentType": "Item",
-              "Edit":  "",
-              "Color" : element["id"]
+              "Edit":  ""
+              // "Color" : element["id"]
               
             }
           }
