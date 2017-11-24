@@ -133,9 +133,10 @@ async function updateIndustryList(response, request) {
               "Title": element["values"]["no"],
               "ContentType": "Item",
               "Edit": "",
-              "Cvid": element["id"]
+              "id": element["id"]
             }
           }
+          
           client
             .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
             .post(instance, (err, res) => {
