@@ -114,7 +114,7 @@ async function updateIndustryList(response, request) {
           }
         }
 
-        if(newInstanceslength === 0){
+        if(newInstances.length === 0){
           response.writeHead(200, { "Content-Type": "application/json" });
           response.end(JSON.stringify("No new data"));
           return;
