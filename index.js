@@ -94,14 +94,17 @@ async function updateIndustryList(response, request) {
         console.log(existingInstances.length + " existing items");
         var userArray = JSON.parse(body);
         console.log(userArray.length + " new items to insert");
-        newInstances = userArray;
+        //newInstances = userArray;
 
 
 
+        userArray.forEach((item) => {
+          newInstances.push(item);
+        });
+       
 
 
-
-
+        console.log(newInstances.length + " newInstances start");
 
         var count = 0;
         var Totalcount = 0;
@@ -113,24 +116,21 @@ async function updateIndustryList(response, request) {
               str1 =  str1.trim();
               str2 =  str2.trim();
 
-              console.log(str2 + " " + str1);
-
               if (str1 === str2) {
-                console.log("Skipping ************** " + userArray[x]["values"]["no"]);
-                console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
-              
-               // newInstances.splice(userArray[x], 1);     
+                // console.log("Skipping ************** " + userArray[x]["values"]["no"]);
+                // console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
+               newInstances.splice(userArray[x], 1);     
                count++;          
               }  
              
-              Totalcount++;
+              // Totalcount++;
           }
         }
 
 
         console.log(Totalcount + " total count");
         console.log(count + " equals found");
-        console.log(newInstances.length + " new items to insert");
+        console.log(newInstances.length + " newInstances end");
 
       if(existingInstances === 0){
         newInstances = userArray;
