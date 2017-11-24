@@ -102,7 +102,7 @@ async function updateIndustryList(response, request) {
             for(var x = 0; x < userArray.length; x++ ){
                 
 
-              if (JSON.stringify(existingInstances[i]["fields"]["Title"]) === JSON.stringify(userArray[x]["values"]["no"])) {
+              if (JSON.stringify(existingInstances[i]["fields"]["Title"]) == JSON.stringify(userArray[x]["values"]["no"])) {
                 console.log("Skipping ****************************" + userArray[x]["values"]["no"]);
                 newInstances.splice(userArray[x], 1);     
                 count++;
@@ -112,7 +112,7 @@ async function updateIndustryList(response, request) {
           }
         }
     
-        existingInstances.filter((n) => array2.includes(n))
+       // existingInstances.filter((n) => array2.includes(n))
 
         console.log(count + " equals found");
         console.log(newInstances.length + " new items to insert");
