@@ -104,16 +104,17 @@ async function updateIndustryList(response, request) {
               var str1 = JSON.stringify(existingInstances[i]["fields"]["Title"]);
               var str2 = JSON.stringify(userArray[x]["values"]["no"]);
               str1 =  str1.trim();
-              str2 = str2.trim();
-             
-              if (str1 === str2 ) {
+              str2 =  str2.trim();
+
+              console.log(str2 + " " + str1);
+
+              if (str1 === str2) {
                 console.log("Skipping ************** " + userArray[x]["values"]["no"]);
                 console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
               
                 newInstances.splice(userArray[x], 1);     
                 count++;            
-              }
-         
+              }   
           }
         }
 
