@@ -96,6 +96,13 @@ async function updateIndustryList(response, request) {
         console.log(userArray.length + " new items to insert");
         newInstances = userArray;
 
+
+
+
+
+
+
+
         var count = 0;
         var Totalcount = 0;
         for(var i = 0; i < existingInstances.length; i++ ){
