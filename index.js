@@ -95,14 +95,16 @@ async function updateIndustryList(response, request) {
         var userArray = JSON.parse(body);
         newInstances = userArray;
 
+        var count = 0;
       for(var x = 0; x < userArray.length; x++ ){
        //   existingInstances.forEach(instance => {
-              console.log(x);
+            
           //    userArray.forEach(item => {
             for(var i = 0; i < existingInstances.length; i++ ){
               if (existingInstances[i]["fields"]["Title"] === userArray[x]["values"]["no"]) {
-                newInstances.splice(userArray[x], 1);
                 console.log("Skipping " +  userArray[x]["values"]["no"]);
+                newInstances.splice(userArray[x], 1);     
+                count++;
               }
               console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
            // });
@@ -110,7 +112,7 @@ async function updateIndustryList(response, request) {
         }
         // });
 
-
+        console.log(count + " equals found");
         console.log(newInstances.length + " new items to insert");
 
       if(existingInstances === 0){
