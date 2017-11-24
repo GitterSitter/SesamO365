@@ -103,16 +103,20 @@ async function updateIndustryList(response, request) {
                 
               var str1 = JSON.stringify(existingInstances[i]["fields"]["Title"]);
               var str2 = JSON.stringify(userArray[x]["values"]["no"]);
+              var cvid1 = userArray[x]["Cvid"];
+              var cvid2 = existingInstances[x]["fields"]["Cvid"];
 
               if (str1 === str2 ) {
-                console.log("Skipping ****************************" + userArray[x]["values"]["no"]);
+                console.log("Skipping ************** " + userArray[x]["values"]["no"]);
                 console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
               
                 newInstances.splice(userArray[x], 1);     
-                count++;
+              
                
               }
-       
+              if (cvid1 === cvid2 ){
+                count++;
+              }
           }
         }
 
@@ -128,7 +132,8 @@ async function updateIndustryList(response, request) {
             "fields": {
               "Title": element["values"]["no"],
               "ContentType": "Item",
-              "Edit": ""
+              "Edit": "",
+              "Cvid": element["id"]
             }
           }
           client
