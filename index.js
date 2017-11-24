@@ -102,9 +102,9 @@ async function updateIndustryList(response, request) {
             for(var x = 0; x < userArray.length; x++ ){
                 
               var str1 = JSON.stringify(existingInstances[i]["fields"]["Title"]);
-              str1.trim();
               var str2 = JSON.stringify(userArray[x]["values"]["no"]);
-              str2.trim();
+              str1 =  str1.trim();
+              str2 = str2.trim();
              
               if (str1 === str2 ) {
                 console.log("Skipping ************** " + userArray[x]["values"]["no"]);
