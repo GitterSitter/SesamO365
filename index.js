@@ -102,21 +102,18 @@ async function updateIndustryList(response, request) {
             for(var x = 0; x < userArray.length; x++ ){
                 
               var str1 = JSON.stringify(existingInstances[i]["fields"]["Title"]);
+              str1.trim();
               var str2 = JSON.stringify(userArray[x]["values"]["no"]);
-              var cvid1 = userArray[x]["Cvid"];
-              var cvid2 = existingInstances[x]["fields"]["Cvid"];
-
+              str2.trim();
+             
               if (str1 === str2 ) {
                 console.log("Skipping ************** " + userArray[x]["values"]["no"]);
                 console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
               
                 newInstances.splice(userArray[x], 1);     
-              
-               
+                count++;            
               }
-              if (cvid1 === cvid2 ){
-                count++;
-              }
+         
           }
         }
 
@@ -132,7 +129,7 @@ async function updateIndustryList(response, request) {
             "fields": {
               "Title": element["values"]["no"],
               "ContentType": "Item",
-              "Edit":  element["id"]
+              "Edit":  ""
               
             }
           }
