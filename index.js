@@ -97,7 +97,7 @@ async function updateIndustryList(response, request) {
         newInstances = userArray;
 
         var count = 0;
-
+        var Totalcount = 0;
         for(var i = 0; i < existingInstances.length; i++ ){
             for(var x = 0; x < userArray.length; x++ ){
                 
@@ -112,12 +112,16 @@ async function updateIndustryList(response, request) {
                 console.log("Skipping ************** " + userArray[x]["values"]["no"]);
                 console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
               
-                newInstances.splice(userArray[x], 1);     
-                count++;            
-              }   
+               // newInstances.splice(userArray[x], 1);     
+               count++;          
+              }  
+             
+              Totalcount++;
           }
         }
 
+        
+        console.log(Totalcount + " total count");
         console.log(count + " equals found");
         console.log(newInstances.length + " new items to insert");
 
@@ -130,7 +134,8 @@ async function updateIndustryList(response, request) {
             "fields": {
               "Title": element["values"]["no"],
               "ContentType": "Item",
-              "Edit":  ""
+              "Edit":  "",
+              "Color" : element["id"]
               
             }
           }
