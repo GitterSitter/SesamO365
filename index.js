@@ -94,20 +94,11 @@ async function updateIndustryList(response, request) {
         console.log(existingInstances.length + " existing items");
         var userArray = JSON.parse(body);
         console.log(userArray.length + " new items to insert");
-        //newInstances = userArray;
-
-
-
+  
         userArray.forEach((item) => {
           newInstances.push(item);
         });
-       
-
-
-        console.log(newInstances.length + " newInstances start");
-
-        var count = 0;
-        var Totalcount = 0;
+      
         for(var i = 0; i < existingInstances.length; i++ ){
             for(var x = 0; x < userArray.length; x++ ){
                 
@@ -117,24 +108,17 @@ async function updateIndustryList(response, request) {
               str2 =  str2.trim();
 
               if (str1 === str2) {
-                // console.log("Skipping ************** " + userArray[x]["values"]["no"]);
-                // console.log(existingInstances[i]["fields"]["Title"] + " === " +  userArray[x]["values"]["no"]);
                newInstances.splice(userArray[x], 1);     
-               count++;          
-              }  
-             
-              // Totalcount++;
+               
+              }                         
           }
         }
 
-
-        console.log(Totalcount + " total count");
-        console.log(count + " equals found");
-        console.log(newInstances.length + " newInstances end");
-
-      if(existingInstances === 0){
-        newInstances = userArray;
-      }
+        if(newInstanceslength === 0){
+          response.writeHead(200, { "Content-Type": "application/json" });
+          response.end(JSON.stringify("No new data"));
+          return;
+        } else {
 
        newInstances.forEach(element => {
           var instance = {
@@ -142,11 +126,9 @@ async function updateIndustryList(response, request) {
               "Title": element["values"]["no"],
               "ContentType": "Item",
               "Edit":  ""
-              // "Color" : element["id"]
-              
+              // "Color" : element["id"]             
             }
           }
-
           client
             .api("https://graph.microsoft.com/beta/sites/bouvetasa.sharepoint.com,b3c83103-d5d4-4aa4-8209-5b8310dbffe4,acbae1fd-c062-4c70-8bc2-a65083ad4d51/lists/99f3451a-7273-4b3f-ba7a-5dc608fdce6b/items")
             .post(instance, (err, res) => {
@@ -159,6 +141,8 @@ async function updateIndustryList(response, request) {
         });
         response.writeHead(200, { "Content-Type": "application/json" });
         response.end(JSON.stringify("Instances inserted: " + userArray.length));
+
+      }
       });
     });
 
